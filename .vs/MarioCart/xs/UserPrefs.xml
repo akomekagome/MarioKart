@@ -1,0 +1,49 @@
+﻿<Properties StartupConfiguration="{1F45A5F6-0FF3-A7B5-2020-EE498E2751E1}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Karts/KartMover.cs">
+    <Files>
+      <File FileName="Assets/Scripts/Damages/IAttacker.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Players/PlayerConstatns/PlayreItmeconstant.cs" />
+      <File FileName="Assets/Scripts/Items/Turbo.cs" />
+      <File FileName="Assets/Scripts/Items/Turbos.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Items/SuperSuter.cs" />
+      <File FileName="Assets/Scripts/Items/MIssile.cs" />
+      <File FileName="Assets/Scripts/Players/PlayerCore.cs" />
+      <File FileName="Assets/Scripts/Players/PlayerState.cs" />
+      <File FileName="Assets/Scripts/Damages/Damage.cs" />
+      <File FileName="Assets/Scripts/Items/BaseItems/BaseItem.cs" />
+      <File FileName="Assets/Scripts/Items/BaseItems/BaseAttackItem.cs" Line="18" Column="38" />
+      <File FileName="Assets/Scripts/Items/BaseItems/BaseStrengthenItem.cs" />
+      <File FileName="Assets/Scripts/Players/ItemManager/AttackItemManager.cs" Line="19" Column="85" />
+      <File FileName="Assets/Scripts/Players/ItemManager/ItemManager.cs" />
+      <File FileName="Assets/Scripts/Items/ItemEnum.cs" />
+      <File FileName="Assets/Scripts/GameManager/AllSpwaner.cs" Line="8" Column="1" />
+      <File FileName="Assets/Scripts/Utils/SendHitMessage.cs" />
+      <File FileName="Assets/Scripts/Utils/Singleton.cs" />
+      <File FileName="Assets/Scripts/GameManager/GameState.cs" />
+      <File FileName="Assets/Scripts/Utils/Vector3Extensions.cs" />
+      <File FileName="Assets/Scripts/Utils/GetAllChildren.cs" />
+      <File FileName="Assets/Scripts/Utils/FPSCounter.cs" />
+      <File FileName="Assets/Scripts/GameManager/RankManager.cs" />
+      <File FileName="Assets/Scripts/GameManager/PlayerManager.cs" />
+      <File FileName="Assets/Scripts/Items/ItemObject/IItemObject.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Karts/KartMover.cs" Line="298" Column="1" />
+      <File FileName="Assets/Scripts/Karts/KartStatsMaster.cs" />
+      <File FileName="Assets/Scripts/Karts/KartStats.cs" />
+      <File FileName="Assets/Scripts/Karts/IKartCollider.cs" />
+      <File FileName="Assets/Scripts/Players/PlayerInput.cs" />
+      <File FileName="Assets/Scripts/Karts/GroundInfo.cs" />
+      <File FileName="Assets/Scripts/Players/IPlayerInput.cs" />
+      <File FileName="Assets/Scripts/Items/ItemType/AttackItemType.cs" />
+      <File FileName="Assets/Scripts/Items/ItemObject/AttackItemObject.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/TestInstaller.cs" Line="8" Column="6" />
+      <File FileName="Assets/Plugins/Zenject/Source/Editor/ZenMenuItems.cs" Line="203" Column="32" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="79eeaf48-24bd-4630-8f86-326b0aec2c40" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
