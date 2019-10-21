@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
-using MC.Players.Constants;
 using MC.Utils;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
@@ -27,20 +26,12 @@ public enum DriftState
 
 namespace MC.Karts{
 
-    /// <summary>
-    /// ジェネリックを隠すために継承してしまう
-    /// [System.Serializable]を書くのを忘れない
-    /// </summary>
     [System.Serializable]
     public class RayOriginTable : Serialize.TableBase<DirectionEnum, Transform, RayOriginPair>
     {                                                                                                                                                       
 
     }
 
-    /// <summary>
-    /// ジェネリックを隠すために継承してしまう
-    /// [System.Serializable]を書くのを忘れない
-    /// </summary>
     [System.Serializable]
     public class RayOriginPair : Serialize.KeyAndValue<DirectionEnum, Transform>
     {
@@ -63,16 +54,20 @@ namespace MC.Karts{
         private GroundInfo currentGroundInfo;
         private Vector3 currentVelocity;
         private Vector3 currentPos;
+        private Vector3 moveMent;
         private Vector3 rigidbodyPos;
         private Quaternion rotationStream;
         private float deltaTime;
         private float rotationCorrectionSpeed = 180f;
         public float minDriftStartAngle = 15f;
         public float maxDriftStartAngle = 90f;
+        public float minDriftingSteering = 0.2f;
         private RaycastHit[] raycastHitBuffer = new RaycastHit[8];
         Collider[] colliderBuffer = new Collider[8];
         private DriftState driftState;
-        private KartStats stats;
+        [SerializeField]private KartStats stats;
+        private LayerMask groundLayers;
+        private LayerMask allCollidingLayers;
 
         const int MaxPenetrationSolves = 3;
         const float GroundToCapsuleOffsetDistance = 0.025f;
@@ -90,35 +85,12 @@ namespace MC.Karts{
         private void Start()
         {
             var input = GetComponent<IPlayerInput>();
-            var state = GetComponent<PlayerState>();
             cc = GetComponent<CapsuleCollider>();
             rb = GetComponent<Rigidbody>();
             core = GetComponent<PlayerCore>();
-
-            //this.UpdateAsObservable()
-            //    .Subscribe(_ =>
-            //    {
-            //        var rotationStream = rb.rotation;
-            //        var deltaTime = Time.deltaTime;
-            //        currentPos = rb.position;
-            //        var currentGroundInfo = CheckForGround(deltaTime, rotationStream, Vector3.zero);
-            //        //Hop(rotationStream, currentGroundInfo);
-            //        GroundInfo nextGroundInfo = CheckForGround(deltaTime, rotationStream, currentVelocity * deltaTime);
-            //        StartDrift(currentGroundInfo, nextGroundInfo, rotationStream);
-            //        StopDrift(deltaTime);
-            //        CalculateDrivingVelocity(deltaTime, currentGroundInfo, rotationStream);
-
-            //        Vector3 penetrationOffset = SolvePenetration(rotationStream);
-            //        penetrationOffset = ProcessVelocityCollisions(deltaTime, rotationStream, penetrationOffset);
-
-            //        rotationStream = Quaternion.RotateTowards(rb.rotation, rotationStream, rotationCorrectionSpeed * deltaTime);
-
-            //        AdjustVelocityByPenetrationOffset(deltaTime, ref penetrationOffset);
-
-            //        rb.MoveRotation(rotationStream);
-            //        rb.MovePosition(currentPos + currentPos);
-            //    });
-
+            groundLayers = LayerMask.GetMask("Default");
+            allCollidingLayers = LayerMask.GetMask("Ground");
+            
             this.UpdateAsObservable()
                 .Subscribe(_ =>
                 {
@@ -135,21 +107,25 @@ namespace MC.Karts{
             this.UpdateAsObservable()
                 .Subscribe(_ => nextGroundInfo = CheckForGround(deltaTime, rotationStream, currentVelocity * deltaTime));
 
+            input.OnMoveButtonObseravable
+                .Where(x => x)
+                .Subscribe(x => TurnKart(deltaTime, ref rotationStream));
 
             input.OnDriftButtonsObservable
                 .Subscribe(l =>
                 {
                     if (l.Any())
                         StartDrift(currentGroundInfo, nextGroundInfo, rotationStream, l);
-                    else
+                    else if(driftState != DriftState.NotDrifting) 
                         StopDrift(deltaTime);
                 });
+
+            input.OnMoveDirectionFloatObservable
+                .Subscribe(f => CalculateDrivingVelocity(deltaTime, f, currentGroundInfo, rotationStream));
 
             this.UpdateAsObservable()
                 .Subscribe(_ =>
                 {
-                    CalculateDrivingVelocity(deltaTime, currentGroundInfo, rotationStream);
-
                     Vector3 penetrationOffset = SolvePenetration(rotationStream);
                     penetrationOffset = ProcessVelocityCollisions(deltaTime, rotationStream, penetrationOffset);
 
@@ -159,15 +135,31 @@ namespace MC.Karts{
                 });
 
             this.FixedUpdateAsObservable()
+                .Skip(1)
                 .Subscribe(_ =>
                 {
-
-                    rb.MoveRotation(rotationStream);
-                    rb.MovePosition(currentPos + currentPos);
+                    rb.MoveRotation(rotationStream.normalized);
+                    rb.MovePosition(currentPos + moveMent);
                 });
         }
 
 
+        void TurnKart(float duringTime, ref Quaternion stream)
+        {
+            Vector3 localVelocity = Quaternion.Inverse(rotationStream) * Quaternion.Inverse(driftOffset) * currentVelocity;
+            float forwardReverseSwitch = Mathf.Sign(localVelocity.z);
+            //float modifiedSteering = core.HasControl.Value ? m_Input.Steering * forwardReverseSwitch : 0f;
+            float modifiedSteering = core.HasControl.Value ? forwardReverseSwitch : 0f;
+            if (driftState == DriftState.FacingLeft)
+                modifiedSteering = Mathf.Clamp(modifiedSteering, -1f, -minDriftingSteering);
+            else if (driftState == DriftState.FacingRight)
+                modifiedSteering = Mathf.Clamp(modifiedSteering, minDriftingSteering, 1f);
+
+            float speedProportion = currentVelocity.sqrMagnitude > 0f ? 1f : 0f;
+            float turn = stats.turnSpeed * modifiedSteering * speedProportion * deltaTime;
+            Quaternion deltaRotation = Quaternion.Euler(0f, turn, 0f);
+            rotationStream = rotationStream * deltaRotation;
+        }
         void Hop(Quaternion stream, GroundInfo groundInfo)
         {
             //if (currentGroundInfo.isGrounded && m_Input.HopPressed && m_HasControl)
@@ -236,9 +228,7 @@ namespace MC.Karts{
             {
                 var dot = Vector3.Dot(groundInfo.normal, currentVelocity.normalized);
                 if (dot > VelocityNormalAirborneDot)
-                {
                     groundInfo.isGrounded = false;
-                }
             }
 
             return groundInfo;
@@ -249,25 +239,19 @@ namespace MC.Karts{
             int hits = Physics.RaycastNonAlloc(ray, raycastHitBuffer, rayDistance, layerMask, query);
 
             hit = new RaycastHit();
-            hit.distance = float.PositiveInfinity;
 
-            bool hitSelf = false;
-            for (int i = 0; i < hits; i++)
-            {
-                if (raycastHitBuffer[i].collider == cc)
-                {
-                    hitSelf = true;
-                    continue;
-                }
+            var othersRayCastHits = raycastHitBuffer
+                .Take(hits)
+                .Where(x => x.collider != cc);
 
-                if (raycastHitBuffer[i].distance < hit.distance)
-                    hit = raycastHitBuffer[i];
-            }
+            if (!othersRayCastHits.Any())
+                return false;
 
-            if (hitSelf)
-                hits--;
+            hit = othersRayCastHits
+                .MinBy(x => x.distance)
+                .First();
 
-            return hits > 0;
+            return true;
         }
 
         void StartDrift(GroundInfo currentInfo, GroundInfo nextInfo, Quaternion stream, List<DriftState> driftEnum)
@@ -275,27 +259,19 @@ namespace MC.Karts{
             if (!currentInfo.isGrounded && nextInfo.isGrounded && core.HasControl.Value && driftState == DriftState.NotDrifting)
             {
                 Vector3 kartForward = (stream * Vector3.forward).SetY(0f).normalized;
-                //kartForward.y = 0f;
-                //kartForward.Normalize();
                 Vector3 flatVelocity = currentVelocity.SetY(0f).normalized;
-                //flatVelocity.y = 0f;
-                //flatVelocity.Normalize();
 
                 float signedAngle = Vector3.SignedAngle(kartForward, flatVelocity, Vector3.up);
 
-                if (signedAngle > minDriftStartAngle && signedAngle < maxDriftStartAngle && driftEnum == DriftState.FacingRight)
+                if (signedAngle > minDriftStartAngle && signedAngle < maxDriftStartAngle && driftEnum.Contains(DriftState.FacingRight))
                 {
                     driftOffset = Quaternion.Euler(0f, signedAngle, 0f);
                     driftState = DriftState.FacingLeft;
-
-                    //OnDriftStarted.Invoke();
                 }
-                else if (signedAngle < -minDriftStartAngle && signedAngle > -maxDriftStartAngle && driftEnum == DriftState.FacingLeft)
+                else if (signedAngle < -minDriftStartAngle && signedAngle > -maxDriftStartAngle && driftEnum.Contains(DriftState.FacingLeft))
                 {
                     driftOffset = Quaternion.Euler(0f, signedAngle, 0f);
                     driftState = DriftState.FacingRight;
-
-                    //OnDriftStarted.Invoke();
                 }
             }
         }
@@ -314,14 +290,14 @@ namespace MC.Karts{
             }
         }
 
-        void CalculateDrivingVelocity(float duringTime, GroundInfo groundInfo, Quaternion stream)
+        void CalculateDrivingVelocity(float duringTime, float inputAcceleration, GroundInfo groundInfo, Quaternion stream)
         {
             Vector3 localVelocity = Quaternion.Inverse(stream) * Quaternion.Inverse(driftOffset) * currentVelocity;
             if (groundInfo.isGrounded)
             {
                 localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0f, stats.grip * duringTime);
 
-                float acceleration = core.HasControl.Value ? m_Input.Acceleration : localVelocity.z > 0.05f ? -1f : 0f;
+                float acceleration = core.HasControl.Value ? inputAcceleration : localVelocity.z > 0.05f ? -1f : 0f;
 
                 if (acceleration > -DeadZone && acceleration < DeadZone)    // No acceleration input.
                     localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, stats.coastingDrag * duringTime);
@@ -380,7 +356,7 @@ namespace MC.Karts{
 
                 if (kartCollider != null)
                 {
-                    currentVelocity = kartCollider.ModifyVelocity(this, raycastHitBuffer[i]);
+                    //currentVelocity = kartCollider.ModifyVelocity(this, raycastHitBuffer[i]);
 
                     if (Mathf.Abs(Vector3.Dot(raycastHitBuffer[i].normal, Vector3.up)) <= .2f)
                     {
@@ -448,7 +424,7 @@ namespace MC.Karts{
                 }
             }
 
-            currentPos = currentVelocity * duringTime + penetrationOffset;
+            moveMent = currentVelocity * duringTime + penetrationOffset;
         }
     }
 }

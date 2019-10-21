@@ -1,47 +1,74 @@
 ﻿<Properties StartupConfiguration="{1F45A5F6-0FF3-A7B5-2020-EE498E2751E1}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Karts/KartMover.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/MC/Scripts/KartSamples/KartMovement.cs">
     <Files>
-      <File FileName="Assets/Scripts/Damages/IAttacker.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Players/PlayerConstatns/PlayreItmeconstant.cs" />
-      <File FileName="Assets/Scripts/Items/Turbo.cs" />
-      <File FileName="Assets/Scripts/Items/Turbos.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Items/SuperSuter.cs" />
-      <File FileName="Assets/Scripts/Items/MIssile.cs" />
-      <File FileName="Assets/Scripts/Players/PlayerCore.cs" />
-      <File FileName="Assets/Scripts/Players/PlayerState.cs" />
-      <File FileName="Assets/Scripts/Damages/Damage.cs" />
-      <File FileName="Assets/Scripts/Items/BaseItems/BaseItem.cs" />
-      <File FileName="Assets/Scripts/Items/BaseItems/BaseAttackItem.cs" Line="18" Column="38" />
-      <File FileName="Assets/Scripts/Items/BaseItems/BaseStrengthenItem.cs" />
-      <File FileName="Assets/Scripts/Players/ItemManager/AttackItemManager.cs" Line="19" Column="85" />
-      <File FileName="Assets/Scripts/Players/ItemManager/ItemManager.cs" />
-      <File FileName="Assets/Scripts/Items/ItemEnum.cs" />
-      <File FileName="Assets/Scripts/GameManager/AllSpwaner.cs" Line="8" Column="1" />
-      <File FileName="Assets/Scripts/Utils/SendHitMessage.cs" />
-      <File FileName="Assets/Scripts/Utils/Singleton.cs" />
-      <File FileName="Assets/Scripts/GameManager/GameState.cs" />
-      <File FileName="Assets/Scripts/Utils/Vector3Extensions.cs" />
-      <File FileName="Assets/Scripts/Utils/GetAllChildren.cs" />
-      <File FileName="Assets/Scripts/Utils/FPSCounter.cs" />
-      <File FileName="Assets/Scripts/GameManager/RankManager.cs" />
-      <File FileName="Assets/Scripts/GameManager/PlayerManager.cs" />
-      <File FileName="Assets/Scripts/Items/ItemObject/IItemObject.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/Karts/KartMover.cs" Line="298" Column="1" />
-      <File FileName="Assets/Scripts/Karts/KartStatsMaster.cs" />
-      <File FileName="Assets/Scripts/Karts/KartStats.cs" />
-      <File FileName="Assets/Scripts/Karts/IKartCollider.cs" />
-      <File FileName="Assets/Scripts/Players/PlayerInput.cs" />
-      <File FileName="Assets/Scripts/Karts/GroundInfo.cs" />
-      <File FileName="Assets/Scripts/Players/IPlayerInput.cs" />
-      <File FileName="Assets/Scripts/Items/ItemType/AttackItemType.cs" />
-      <File FileName="Assets/Scripts/Items/ItemObject/AttackItemObject.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/TestInstaller.cs" Line="8" Column="6" />
-      <File FileName="Assets/Plugins/Zenject/Source/Editor/ZenMenuItems.cs" Line="203" Column="32" />
+      <File FileName="Assets/MC/Scripts/Karts/KartMover.cs" Line="243" Column="38" />
+      <File FileName="Assets/MC/Scripts/Utils/ListExtensions.cs" />
+      <File FileName="Assets/MC/Scripts/Players/IPlayerInput.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerInput.cs" />
+      <File FileName="Assets/MC/Scripts/Karts/IKartCollider.cs" />
+      <File FileName="Assets/MC/Scripts/Karts/KartStats.cs" />
+      <File FileName="Assets/MC/Scripts/Karts/KartStatsMaster.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerState.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerCore.cs" Line="73" Column="27" />
+      <File FileName="Assets/MC/Scripts/Karts/GroundInfo.cs" />
+      <File FileName="Assets/MC/Scripts/Players/IPlayerRankReadle.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerAnimator.cs" />
+      <File FileName="Assets/MC/Scripts/ItemCollisons/IItemCollisonable.cs" />
+      <File FileName="Assets/MC/Scripts/ItemCollisons/IDisappearable.cs" />
+      <File FileName="Assets/MC/Scripts/Items/IItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/Item.cs" Line="35" Column="1" />
+      <File FileName="Assets/MC/Scripts/Items/IDropOutItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/IDefendingItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/IAttackItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/IStrengthenItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/IHaveTargetItem.cs" />
+      <File FileName="Assets/MC/Scripts/Items/RandomItemBox.cs" Line="18" Column="46" />
+      <File FileName="Assets/Plugins/Zenject/Source/Editor/ZenMenuItems.cs" />
+      <File FileName="Assets/MC/Scripts/Players/ItemUser.cs" Line="30" Column="1" />
+      <File FileName="Assets/MC/Scripts/Players/ItemGetter.cs" Line="30" Column="1" />
+      <File FileName="Assets/MC/Scripts/GameManager/ItemGenerator.cs" Line="27" Column="37" />
+      <File FileName="Assets/MC/Scripts/Items/Shell.cs" />
+      <File FileName="Assets/MC/Scripts/Items/GreenShell.cs" />
+      <File FileName="Assets/MC/Scripts/Damages/PlayerAttacker.cs" Line="1" Column="1" />
+      <File FileName="Assets/MC/Scripts/Damages/IAttacker.cs" />
+      <File FileName="Assets/MC/Scripts/Effects/IEffectAffectable.cs" />
+      <File FileName="Assets/MC/Scripts/Effects/Effect.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerDamageable.cs" />
+      <File FileName="Assets/MC/Scripts/Damages/IDamageable.cs" />
+      <File FileName="Assets/MC/Scripts/Players/PlayerEffectAffecter.cs" />
+      <File FileName="Assets/MC/Scripts/Players/IPlayerDamageables.cs" />
+      <File FileName="Assets/MC/Scripts/Damages/Damage.cs" />
+      <File FileName="Assets/MC/Scripts/Items/DamageType.cs" />
+      <File FileName="Assets/MC/Scripts/Used/Usage.cs" />
+      <File FileName="Assets/MC/Scripts/Used/TimeLimitUsage.cs" />
+      <File FileName="Assets/MC/Scripts/Used/UseLimitUsage.cs" />
+      <File FileName="Assets/MC/Scripts/Used/IUseable.cs" />
+      <File FileName="Assets/MC/Scripts/Used/UseLimitAnyIntervalUsage.cs" />
+      <File FileName="Assets/MC/Scripts/Items/Mushroom.cs" />
+      <File FileName="Assets/MC/Scripts/Effects/AccelerationEffect.cs" />
+      <File FileName="Assets/MC/Scripts/Items/StrengthenType.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/Entity.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/IMovingEntity.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/IDefendingEntity.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/IMovingTogtherEntity.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/IInstalledEntity.cs" />
+      <File FileName="Assets/MC/Scripts/GameManager/ItemEntityGenerator.cs" />
+      <File FileName="Assets/MC/Scripts/Entitys/MushroomEntity.cs" Line="1" Column="1" />
+      <File FileName="Assets/MC/Scripts/Stages/StageCore.cs" Line="12" Column="59" />
+      <File FileName="Assets/MC/Scripts/Track/CheckPoint.cs" Line="33" Column="38" />
+      <File FileName="Assets/MC/Scripts/GameManager/RankManager.cs" Line="146" Column="33" />
+      <File FileName="Assets/MC/Scripts/GameManager/RankInfo.cs" Line="1" Column="1" />
+      <File FileName="Assets/MC/Scripts/Utils/FPSCounter.cs" Line="1" Column="1" />
+      <File FileName="Assets/MC/Scripts/GameManager/StageSpwaner.cs" Line="22" Column="37" />
+      <File FileName="Assets/MC/Scripts/GameManager/GameState.cs" Line="66" Column="74" />
+      <File FileName="Assets/MC/Scripts/GameManager/PlayerManager.cs" Line="12" Column="15" />
+      <File FileName="Assets/Plugins/UniRx/Scripts/Async/UniTaskScheduler.cs" Line="81" Column="1" />
+      <File FileName="Assets/MC/Scripts/KartSamples/KartMovement.cs" Line="468" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="79eeaf48-24bd-4630-8f86-326b0aec2c40" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="9131dd35-88e7-4c80-b697-68b38d93f68d" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

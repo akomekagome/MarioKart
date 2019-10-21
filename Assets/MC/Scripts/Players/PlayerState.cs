@@ -6,7 +6,6 @@ using System.Linq;
 using UniRx;
 using UniRx.Triggers;
 using MC.Items;
-using MC.Players.Constants;
 
 public enum PlayerStateEnum{
     Normal,
@@ -48,26 +47,26 @@ namespace MC.Players{
             this.UpdateAsObservable()
                 .Where(_ => Input.GetKeyDown(KeyCode.O))
                 .Subscribe(_ => _currentPlayerStates.Add(PlayerStateEnum.SpeedUp));
-            var itemManager = GetComponent<StrengthenItemManager>();
-            var core = GetComponent<PlayerCore>();
+            //var itemManager = GetComponent<StrengthenItemManager>();
+            //var core = GetComponent<PlayerCore>();
 
-            itemManager?.CurrnetItem
-                       .OfType(default(BaseStrengthenItem))
-                       .Subscribe(x =>
-                       {
-                           x.StateChangeObservable
-                            .Subscribe(z =>
-                            {
-                                if (StateDubplicatonJudge(z)) _stateDuplicationObservable.OnNext(z);
-                                else _currentPlayerStates.Add(z);
+            //itemManager?.CurrnetItem
+            //           .OfType(default(BaseStrengthenItem))
+            //           .Subscribe(x =>
+            //           {
+            //               x.StateChangeObservable
+            //                .Subscribe(z =>
+            //                {
+            //                    if (StateDubplicatonJudge(z)) _stateDuplicationObservable.OnNext(z);
+            //                    else _currentPlayerStates.Add(z);
 
-                                Observable.Timer(TimeSpan.FromSeconds(PlayreItmeconstant.itemEffectIime[z]))
-                                          .TakeUntil(StateDuplicationObserbable)
-                                          .Subscribe(_ => _currentPlayerStates.Remove(z),
-                                                     () => Debug.Log("stop observable")).AddTo(this);
+            //                    Observable.Timer(TimeSpan.FromSeconds(PlayreItmeconstant.itemEffectIime[z]))
+            //                              .TakeUntil(StateDuplicationObserbable)
+            //                              .Subscribe(_ => _currentPlayerStates.Remove(z),
+            //                                         () => Debug.Log("stop observable")).AddTo(this);
                               
-                            });
-                       });
+            //                });
+            //           });
         }
     }
 

@@ -23,6 +23,13 @@ namespace MC.Players{
         private Subject<bool> itemButtonObseravable = new Subject<bool>();
         private Subject<DriftState> driftstateSubject = new Subject<DriftState>();
         private Subject<List<DriftState>> driftButtonsSubject = new Subject<List<DriftState>>();
+        private ReactiveProperty<bool> _isAccelerating = new ReactiveProperty<bool>();
+        private ReactiveProperty<bool> _isJumping = new ReactiveProperty<bool>();
+        private ReactiveProperty<bool> _hasUsingItme = new ReactiveProperty<bool>();
+        private ReactiveProperty<float> _straightAccelerate = new ReactiveProperty<float>();
+        private ReactiveProperty<float> _bendAccelerate = new ReactiveProperty<float>();
+        private ReactiveProperty<bool> _isDefending = new ReactiveProperty<bool>();
+
 
         public IObservable<Vector2> OnMoveDirectionVector2Observable { get { return moveDirectionVector2Observable; }}
         public IObservable<float> OnMoveDirectionFloatObservable{ get { return moveDirectionFloatObservable; }}
@@ -33,6 +40,12 @@ namespace MC.Players{
         public IObservable<bool> OnItemButtonObseravable { get { return itemButtonObseravable; } }
         public IObservable<DriftState> OnDriftButtonObservable { get { return driftstateSubject.AsObservable(); } }
         public IObservable<List<DriftState>> OnDriftButtonsObservable { get { return driftButtonsSubject.AsObservable(); } }
+        public IReadOnlyReactiveProperty<bool> IsAccelerating { get { return _isAccelerating.ToReadOnlyReactiveProperty(); } }
+        public IReadOnlyReactiveProperty<bool> IsJumping { get { return _isJumping.ToReadOnlyReactiveProperty(); } }
+        public IReadOnlyReactiveProperty<bool> HasUsingItem { get { return _hasUsingItme.ToReadOnlyReactiveProperty(); } }
+        public IReadOnlyReactiveProperty<float> StraightAccelerate { get { return _straightAccelerate.ToReadOnlyReactiveProperty(); } }
+        public IReadOnlyReactiveProperty<float> BendAccelerate { get { return _bendAccelerate.ToReadOnlyReactiveProperty(); } }
+        public IReadOnlyReactiveProperty<bool> IsDefending { get { return _isDefending.ToReadOnlyReactiveProperty(); } }
 
         private void Start()
         {
@@ -52,7 +65,7 @@ namespace MC.Players{
             this.UpdateAsObservable()
                 .Select(_ => Input.GetKeyDown(KeyCode.E))
                 .Subscribe(drifRightButtonObsrvable);
-           
+
             this.UpdateAsObservable()
                 .Select(_ => Input.GetKeyDown(KeyCode.Q))
                 .Subscribe(drifLeftButtonObsrvable);
@@ -73,6 +86,25 @@ namespace MC.Players{
                     else if (Input.GetKey(KeyCode.Q)) buffer.Add(DriftState.FacingLeft);
                     driftButtonsSubject.OnNext(buffer);
                 });
+
+            this.UpdateAsObservable()
+                .Select(_ => Input.GetAxis(AxisType.Vertical.ToString()))
+                .Subscribe(x => _straightAccelerate.Value = Math.Max(0f, x));
+
+            this.UpdateAsObservable()
+                .Subscribe(_ => _bendAccelerate.Value = Input.GetAxis(AxisType.Horizontal.ToString()));
+
+            this.UpdateAsObservable()
+                .Subscribe(_ => _isJumping.Value = Input.GetKeyDown(KeyCode.Space));
+
+            this.UpdateAsObservable()
+                .Subscribe(_ => _isAccelerating.Value = Input.GetKey(KeyCode.W));
+
+            this.UpdateAsObservable()
+                .Subscribe(_ => _isDefending.Value = Input.GetKey(KeyCode.RightShift));
+
+            this.UpdateAsObservable()
+                .Subscribe(_ => _hasUsingItme.Value = Input.GetKeyDown(KeyCode.R));
         }
     }
     

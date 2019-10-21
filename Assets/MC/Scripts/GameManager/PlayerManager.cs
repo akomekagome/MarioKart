@@ -1,21 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MC.Players;
+using Zenject;
 
-namespace MC.Players
+namespace MC.GameManager
 {
     public class PlayerManager : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
-        
-        }
+        private List<PlayerCore> players = new List<PlayerCore>();
 
-        // Update is called once per frame
-        void Update()
+        public void SetPlayer(PlayerCore playerCore)
         {
-        
+            players.Add(playerCore);
         }
     }
 }

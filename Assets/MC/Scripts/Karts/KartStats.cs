@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace MC.Karts
 {
-
-    public class KartStats
+    [System.Serializable]
+    public struct KartStats
     {
 	    public float acceleration;
 	    public float braking;

@@ -6,6 +6,11 @@ namespace MC.Damages{
     
     public struct Damage{
 
+        public DamageType DamageType { get; private set; }
 
+        public Damage(DamageType damageType)
+        {
+            this.DamageType = damageType;
+        }
     }
 }

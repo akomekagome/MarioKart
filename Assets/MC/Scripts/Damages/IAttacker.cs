@@ -6,8 +6,6 @@ using UniRx;
 namespace MC.Damages{
     
     public interface IAttacker{
-        int PlayerId { get; }
-        int PlayerRunK { get; }
-        ReactiveProperty<bool> PlayerControllable { get; }
+        
     }
 }
