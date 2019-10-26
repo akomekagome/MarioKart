@@ -27,7 +27,7 @@ namespace MC.Track
 
         private void Start()
         {
-            this.OnTriggerEnterAsObservable()
+            this.OnTriggerStayAsObservable()
                 .Select(x => x.GetComponent<PlayerCore>())
                 .Where(x => x != null)
                 .Subscribe(_collisionPlayerSubject);

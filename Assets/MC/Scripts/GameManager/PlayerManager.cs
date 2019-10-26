@@ -6,7 +6,7 @@ using Zenject;
 
 namespace MC.GameManager
 {
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager : MonoBehaviour, IPlayerDamageables
     {
         private List<PlayerCore> players = new List<PlayerCore>();
 

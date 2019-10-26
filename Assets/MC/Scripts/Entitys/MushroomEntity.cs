@@ -14,6 +14,8 @@ namespace MC.Entitys
     {
         private bool installed = false;
         private Effect effect;
+        private Effect Effect => effect;
+
 
         public void Init(Effect effect)
         {

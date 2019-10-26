@@ -25,12 +25,31 @@ public enum PlayerId
 
 namespace MC.Players{
 
-    public class PlayerCore : MonoBehaviour, IPlayerDamageables, IPlayerRankReadle
+    public class PlayerCore : MonoBehaviour
     {
         private PlayerId _playerId = PlayerId.Player1;
         public PlayerId PlayerId { get { return _playerId; } }
 
-        public PlayerId SetPlayerId(PlayerId playerId) => this._playerId = playerId;
+        private IPlayerDamageables _playerDamageables;
+        private IPlayerRankReadle _rankReadle;
+
+        public IPlayerDamageables PlayerDamageables => _playerDamageables;
+        public IPlayerRankReadle RankReadle => _rankReadle;
+
+        public IReadOnlyReactiveProperty<int> PlayerRank { get; private set; } = new ReactiveProperty<int>();
+        
+        public void Init(PlayerId playerId, IPlayerDamageables playerDamageables, IPlayerRankReadle rankReadle)
+        {
+            this._playerId = playerId;
+            this._playerDamageables = playerDamageables;
+            this._rankReadle = rankReadle;
+            PlayerRank = rankReadle.GetRankReactiveProperty(playerId);
+            _onInitialized.OnNext(Unit.Default);
+            _onInitialized.OnCompleted();
+        }
+
+        private AsyncSubject<Unit> _onInitialized = new AsyncSubject<Unit>();
+        public IObservable<Unit> OnInitialized => _onInitialized;
 
         private int playerRunk = 1;
         public int PlayerRunK { get { return playerRunk; } }
@@ -62,7 +81,8 @@ namespace MC.Players{
 
         private void Start()
         {
-            
+            PlayerRank
+                .Subscribe(x => Debug.Log("Id: " + PlayerId + " rank: " + x));
         }
 
         public void ApplyDamage(Damage damage)

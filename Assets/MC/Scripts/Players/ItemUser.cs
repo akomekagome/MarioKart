@@ -27,7 +27,6 @@ namespace MC.Players
             damageable = GetComponent<PlayerDamageable>();
             input = GetComponent<IPlayerInput>();
             getter.UseItemObservable
-                .Do(_ => Debug.Log("get"))
                 .Subscribe(InitItem);
         }
 
@@ -68,7 +67,7 @@ namespace MC.Players
             if (item is IStrengthenItem)
                 ((IStrengthenItem)item).InitStrengthenItem(effectAffecter);
             if (item is IHaveTargetItem)
-                ((IHaveTargetItem)item).InitHaveTargetItem(core, core);
+                //((IHaveTargetItem)item).InitHaveTargetItem(core, core);
             if (item is IDropOutItem)
             {
                 var dropOutObservable =

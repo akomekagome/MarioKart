@@ -7,12 +7,12 @@ public class RankInfo
 {
     public int laps;
     public int rank;
-    public CheckPoint checkPoint;
+    public int checkPointId;
 
-    public RankInfo(int laps, int rank, CheckPoint checkPoint)
+    public RankInfo(int laps, int rank, int checkPointId)
     {
         this.laps = laps;
         this.rank = rank;
-        this.checkPoint = checkPoint;
+        this.checkPointId = checkPointId;
     }
 }

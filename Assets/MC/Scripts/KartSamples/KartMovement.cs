@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 using MC.Players;
+using UniRx;
+using UniRx.Triggers;
 
 namespace KartGame.KartSystems
 {
@@ -119,64 +121,65 @@ namespace KartGame.KartSystems
 
             if (driver != null)
                 m_CurrentModifiers.Add((IKartModifier)driver);
-        }
 
-        void FixedUpdate()
-        {
-            if (Mathf.Approximately(Time.timeScale, 0f))
-                return;
+            this.FixedUpdateAsObservable()
+                .Subscribe(_ =>
+                {
+                    //if (Mathf.Approximately(Time.timeScale, 0f))
+                    //    return;
 
-            if (m_RepositionPositionDelta.sqrMagnitude > float.Epsilon || m_RepositionRotationDelta != Quaternion.identity)
-            {
-                m_Rigidbody.MovePosition(m_Rigidbody.position + m_RepositionPositionDelta);
-                m_Rigidbody.MoveRotation(m_RepositionRotationDelta * m_Rigidbody.rotation);
-                m_RepositionPositionDelta = Vector3.zero;
-                m_RepositionRotationDelta = Quaternion.identity;
-                return;
-            }
+                    if (m_RepositionPositionDelta.sqrMagnitude > float.Epsilon || m_RepositionRotationDelta != Quaternion.identity)
+                    {
+                        m_Rigidbody.MovePosition(m_Rigidbody.position + m_RepositionPositionDelta);
+                        m_Rigidbody.MoveRotation(m_RepositionRotationDelta * m_Rigidbody.rotation);
+                        m_RepositionPositionDelta = Vector3.zero;
+                        m_RepositionRotationDelta = Quaternion.identity;
+                        return;
+                    }
 
-            m_RigidbodyPosition = m_Rigidbody.position;
+                    m_RigidbodyPosition = m_Rigidbody.position;
 
-            KartStats.GetModifiedStats(m_CurrentModifiers, defaultStats, ref m_ModifiedStats);
-            ClearTempModifiers();
+                    KartStats.GetModifiedStats(m_CurrentModifiers, defaultStats, ref m_ModifiedStats);
+                    ClearTempModifiers();
 
-            Quaternion rotationStream = m_Rigidbody.rotation;
+                    Quaternion rotationStream = m_Rigidbody.rotation;
 
-            float deltaTime = Time.deltaTime;
+                    float deltaTime = Time.deltaTime;
 
-            m_CurrentGroundInfo = CheckForGround(deltaTime, rotationStream, Vector3.zero);
+                    m_CurrentGroundInfo = CheckForGround(deltaTime, rotationStream, Vector3.zero);
 
-            Hop(rotationStream, m_CurrentGroundInfo);
+                    Hop(rotationStream, m_CurrentGroundInfo);
 
-            //if (m_CurrentGroundInfo.isGrounded && !m_IsGrounded)
-            //    OnBecomeGrounded.Invoke();
+                    //if (m_CurrentGroundInfo.isGrounded && !m_IsGrounded)
+                    //    OnBecomeGrounded.Invoke();
 
-            //if (!m_CurrentGroundInfo.isGrounded && m_IsGrounded)
-            //    OnBecomeAirborne.Invoke();
+                    //if (!m_CurrentGroundInfo.isGrounded && m_IsGrounded)
+                    //    OnBecomeAirborne.Invoke();
 
-            m_IsGrounded = m_CurrentGroundInfo.isGrounded;
+                    m_IsGrounded = m_CurrentGroundInfo.isGrounded;
 
-            ApplyAirborneModifier(m_CurrentGroundInfo);
+                    ApplyAirborneModifier(m_CurrentGroundInfo);
 
-            GroundInfo nextGroundInfo = CheckForGround(deltaTime, rotationStream, m_Velocity * deltaTime);
+                    GroundInfo nextGroundInfo = CheckForGround(deltaTime, rotationStream, m_Velocity * deltaTime);
 
-            GroundNormal(deltaTime, ref rotationStream, m_CurrentGroundInfo, nextGroundInfo);
-            TurnKart(deltaTime, ref rotationStream);
+                    GroundNormal(deltaTime, ref rotationStream, m_CurrentGroundInfo, nextGroundInfo);
+                    TurnKart(deltaTime, ref rotationStream);
 
-            StartDrift(m_CurrentGroundInfo, nextGroundInfo, rotationStream);
-            StopDrift(deltaTime);
+                    StartDrift(m_CurrentGroundInfo, nextGroundInfo, rotationStream);
+                    StopDrift(deltaTime);
 
-            CalculateDrivingVelocity(deltaTime, m_CurrentGroundInfo, rotationStream);
+                    CalculateDrivingVelocity(deltaTime, m_CurrentGroundInfo, rotationStream);
 
-            Vector3 penetrationOffset = SolvePenetration(rotationStream);
-            penetrationOffset = ProcessVelocityCollisions(deltaTime, rotationStream, penetrationOffset);
+                    Vector3 penetrationOffset = SolvePenetration(rotationStream);
+                    penetrationOffset = ProcessVelocityCollisions(deltaTime, rotationStream, penetrationOffset);
 
-            rotationStream = Quaternion.RotateTowards(m_Rigidbody.rotation, rotationStream, rotationCorrectionSpeed * deltaTime);
+                    rotationStream = Quaternion.RotateTowards(m_Rigidbody.rotation, rotationStream, rotationCorrectionSpeed * deltaTime);
 
-            AdjustVelocityByPenetrationOffset(deltaTime, ref penetrationOffset);
+                    AdjustVelocityByPenetrationOffset(deltaTime, ref penetrationOffset);
 
-            m_Rigidbody.MoveRotation(rotationStream);
-            m_Rigidbody.MovePosition(m_RigidbodyPosition + m_Movement);
+                    m_Rigidbody.MoveRotation(rotationStream);
+                    m_Rigidbody.MovePosition(m_RigidbodyPosition + m_Movement);
+                });
         }
 
         /// <summary>
