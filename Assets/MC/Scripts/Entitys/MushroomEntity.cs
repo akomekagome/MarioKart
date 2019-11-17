@@ -22,9 +22,8 @@ namespace MC.Entitys
             this.effect = effect;
         }
 
-        public void OnInstall(Vector3 playerPos)
+        public void OnInstall(Transform playerTf)
         {
-
         }
 
         private async UniTask Start()

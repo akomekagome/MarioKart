@@ -6,6 +6,6 @@ using UniRx;
 namespace MC.Damages{
     
     public interface IAttacker{
-        
+        PlayerId PlayerId { get; }
     }
 }

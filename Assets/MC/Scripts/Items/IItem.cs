@@ -7,7 +7,12 @@ using MC.Used;
 
 public enum ItemType
 {
-    Mushroom
+    Mushroom,
+    Mine,
+    GreenMissile,
+    SmokeGrenade,
+    RedMissile,
+    AtomicBom
 }
 
 namespace MC.Items
@@ -16,6 +21,6 @@ namespace MC.Items
     {
         IObservable<Unit> FinishObservable { get; }
         ItemType ItemType { get; }
-        void Init(Transform playerTf, IObservable<Unit> useObservable);
+        void Init(Transform playerTf, IReadOnlyReactiveProperty<bool> hasUsingItem);
     }
 }

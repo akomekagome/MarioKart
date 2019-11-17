@@ -7,6 +7,9 @@ using MC.Items;
 using System;
 using Zenject;
 using MC.GameManager;
+using UniRx.Async;
+using MC.Utils;
+using System.Linq;
 
 namespace MC.Players
 {
@@ -21,25 +24,32 @@ namespace MC.Players
         private Subject<IItem> _useItemSubject = new Subject<IItem>();
         public IObservable<IItem> UseItemObservable { get { return _useItemSubject.AsObservable(); } }
 
+        private Subject<float> _turnSlotItemSubject = new Subject<float>();
+        public IObservable<float> TurnSlotItemObsrvable => _turnSlotItemSubject.AsObservable();
+
+        PlayerCore core;
+
         private void Start()
         {
-            var core = GetComponent<PlayerCore>();
+            core = GetComponent<PlayerCore>();
 
             core.GetItemObservable
                 .Where(_ => OwnItems.Count < 2)
                 .Select(x => itemGenerator.CreateItem(x))
-                .Subscribe(x => _ownItems.Add(x));
-
-            OwnItems.ObserveCountChanged()
-                .Where(x => x > 0)
-                .Select(_ => OwnItems[0])
-                .DistinctUntilChanged()
-                .Subscribe(x => {
+                .Do(x =>
+                {
+                    _ownItems.Add(x);
+                    _turnSlotItemSubject.OnNext(2f);
+                })
+                .Delay(TimeSpan.FromSeconds(2f))
+                .SelectMany(x => UniTask.WaitUntil(() => x == OwnItems[0])
+                .ToObservable()
+                .Do(_ => {
                     _useItemSubject.OnNext(x);
-                    x?.FinishObservable
-                    .FirstOrDefault()
-                    .Subscribe(_ => _ownItems.RemoveAt(0));
-                });
+                    x.FinishObservable
+                    .Subscribe(_2 => _ownItems.Remove(x));
+                }))
+                .Subscribe();
         }
     }
 }

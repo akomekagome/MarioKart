@@ -16,28 +16,36 @@ namespace MC.Items
         protected Subject<Unit> _finishSubject = new Subject<Unit>();
         protected Usage usage;
         protected Transform playerTf;
-        protected IObservable<Unit> useObservable;
+        protected IReadOnlyReactiveProperty<bool> hasUsingItem;
         protected ItemType itemType;
 
-        public IObservable<Unit> FinishObservable { get { return _finishSubject.AsObservable(); } }
+        public IObservable<Unit> FinishObservable { get { return _finishSubject.FirstOrDefault().AsObservable(); } }
         public Usage Usage { get { return usage; } }
+
+        private AsyncSubject<Unit> _initializAsyncSubject = new AsyncSubject<Unit>();
+        public IObservable<Unit> Initialized => _initializAsyncSubject;
 
         public ItemType ItemType { get { return itemType; } }
 
-        public void Init(Transform playerTf, IObservable<Unit> useObservable)
+        public void Init(Transform playerTf, IReadOnlyReactiveProperty<bool> hasUsingItem)
         {
             this.playerTf = playerTf;
-            this.useObservable = useObservable;
+            this.hasUsingItem = hasUsingItem;
+            _initializAsyncSubject.OnNext(Unit.Default);
+            _initializAsyncSubject.OnCompleted();
         }
 
-        protected void Start()
+
+        protected async void Start()
         {
-            useObservable
-                .Subscribe(_ => OnUse(),
-                () => _finishSubject.OnNext(Unit.Default));
-
+            gameObject.SetActive(false);
+            await Initialized;
+            gameObject.SetActive(true);
             OnStart();
+
+            FinishObservable.Subscribe(_ => Destroy(this.gameObject));
         }
+
         protected abstract void OnStart();
 
         protected abstract void OnUse();

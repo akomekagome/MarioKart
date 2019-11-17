@@ -20,6 +20,10 @@ namespace MC.Players
             this.transform.localPosition = position;
         }
 
+        public void SetCanvas(Canvas canvas)
+        {
+        }
+
         public void SetRect(Rect rect)
         {
             playerCamera.rect = rect;

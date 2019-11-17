@@ -7,6 +7,6 @@ namespace MC.Entitys
 
     public interface IInstalledEntity : Entity
     {
-        void OnInstall(Vector3 playerPos);
+        void OnInstall(Transform playerTf);
     }
 }

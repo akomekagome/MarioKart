@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using Object = UnityEngine.Object;
+﻿using MC.Effects;
 using MC.Players;
+using System.Collections;
+using System.Collections.Generic;
 using UniRx;
 using UniRx.Triggers;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace KartGame.KartSystems
 {
@@ -63,6 +63,8 @@ namespace KartGame.KartSystems
         //public UnityEvent OnDriftStopped;
         //public UnityEvent OnKartCollision;
 
+        PlayerDamageable playerDamageable;
+        PlayerEffectAffecter playerEffectAffecter;
         IPlayerInput m_Input;
         Vector3 m_RigidbodyPosition;
         Vector3 m_Velocity;
@@ -79,7 +81,6 @@ namespace KartGame.KartSystems
         Collider[] m_ColliderBuffer = new Collider[8];
         Quaternion m_DriftOffset = Quaternion.identity;
         DriftState m_DriftState;
-        bool m_HasControl;
         float m_SteeringInput;
         float m_AccelerationInput;
         bool m_HopPressed;
@@ -108,19 +109,38 @@ namespace KartGame.KartSystems
             allCollidingLayers = LayerMask.GetMask("Default");
         }
 
+        IEnumerator TurnDamageKart(float time)
+        {
+            var startRotate = transform.rotation;
+            var totalTime = time;
+
+            while(totalTime > 0f)
+            {
+                transform.Rotate(transform.up, 360f * 2f * Time.deltaTime, Space.World);
+                totalTime -= Time.deltaTime;
+                yield return null;
+            }
+            transform.rotation = startRotate;
+        }
+
         void Start()
         {
-            m_HasControl = true;
             m_Rigidbody = GetComponent<Rigidbody>();
             m_Capsule = GetComponent<CapsuleCollider>();
             //m_Racer = GetComponent<IRacer>();
             m_Input = GetComponent<IPlayerInput>();
+            playerEffectAffecter = GetComponent<PlayerEffectAffecter>();
+            playerDamageable = GetComponent<PlayerDamageable>();
+            KartStats.GetModifiedStats(m_CurrentModifiers, defaultStats, ref m_ModifiedStats);
 
             if (kart != null)
                 m_CurrentModifiers.Add((IKartModifier)kart);
 
             if (driver != null)
                 m_CurrentModifiers.Add((IKartModifier)driver);
+
+            playerDamageable.DamageObservable
+                .Subscribe(x => StartCoroutine(TurnDamageKart(x.InoperableTime)));
 
             this.FixedUpdateAsObservable()
                 .Subscribe(_ =>
@@ -420,11 +440,13 @@ namespace KartGame.KartSystems
         {
             Vector3 localVelocity = Quaternion.Inverse(rotationStream) * Quaternion.Inverse(m_DriftOffset) * m_Velocity;
             float forwardReverseSwitch = Mathf.Sign(localVelocity.z);
-            float modifiedSteering = m_HasControl ? m_Input.BendAccelerate.Value * forwardReverseSwitch : 0f;
+            float modifiedSteering = playerDamageable.HasControl.Value ? m_Input.BendAccelerate.Value * forwardReverseSwitch : 0f;
+            if (m_DriftState == DriftState.FacingLeft || m_DriftState == DriftState.FacingRight)
+                //Debug.Log("Drift");
             if (m_DriftState == DriftState.FacingLeft)
-                modifiedSteering = Mathf.Clamp(modifiedSteering, -1f, -minDriftingSteering);
+                modifiedSteering = Mathf.Clamp(modifiedSteering, -1f, -minDriftingSteering) * 1.5f;
             else if (m_DriftState == DriftState.FacingRight)
-                modifiedSteering = Mathf.Clamp(modifiedSteering, minDriftingSteering, 1f);
+                modifiedSteering = Mathf.Clamp(modifiedSteering, minDriftingSteering, 1f) * 1.5f;
 
             float speedProportion = m_Velocity.sqrMagnitude > 0f ? 1f : 0f;
             float turn = m_ModifiedStats.turnSpeed * modifiedSteering * speedProportion * deltaTime;
@@ -442,17 +464,35 @@ namespace KartGame.KartSystems
             {
                 localVelocity.x = Mathf.MoveTowards(localVelocity.x, 0f, m_ModifiedStats.grip * deltaTime);
 
-                float acceleration = m_HasControl ? m_Input.StraightAccelerate.Value : localVelocity.z > 0.05f ? -1f : 0f;
+                //float acceleration = playerDamageable.HasControl.Value ? m_Input.StraightAccelerate.Value : localVelocity.z > 0.05f ? -1f : 0f;
 
-                if (acceleration > -k_Deadzone && acceleration < k_Deadzone)    // No acceleration input.
-                    localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, m_ModifiedStats.coastingDrag * deltaTime);
-                else if (acceleration > k_Deadzone)                            // Positive acceleration input.
-                    localVelocity.z = Mathf.MoveTowards(localVelocity.z, m_ModifiedStats.topSpeed, acceleration * m_ModifiedStats.acceleration * deltaTime);
-                else if (localVelocity.z > k_Deadzone)                         // Negative acceleration input and going forwards.
-                    localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, -acceleration * m_ModifiedStats.braking * deltaTime);
-                else                                                           // Negative acceleration input and not going forwards.
-                    localVelocity.z = Mathf.MoveTowards(localVelocity.z, -m_ModifiedStats.reverseSpeed, -acceleration * m_ModifiedStats.reverseAcceleration * deltaTime);
+                float acceleration = m_Input.StraightAccelerate.Value;
+
+                var effects = playerEffectAffecter.CurrentEffects;
+                bool useItem = false;
+                foreach(var effect in effects)
+                {
+                    if(effect is AccelerationEffect)
+                    {
+                        useItem = true;
+                        localVelocity.z = m_ModifiedStats.topSpeed + ((AccelerationEffect)effect).AdditionalSpeed;
+                        break;
+                    }
+                }
+                if (!useItem)
+                {
+                    if (acceleration > -k_Deadzone && acceleration < k_Deadzone)    // No acceleration input.
+                        localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, m_ModifiedStats.coastingDrag * deltaTime);
+                    else if (acceleration > k_Deadzone)                            // Positive acceleration input.
+                        localVelocity.z = Mathf.MoveTowards(localVelocity.z, m_ModifiedStats.topSpeed, acceleration * m_ModifiedStats.acceleration * deltaTime);
+                    else if (localVelocity.z > k_Deadzone)                         // Negative acceleration input and going forwards.
+                        localVelocity.z = Mathf.MoveTowards(localVelocity.z, 0f, -acceleration * m_ModifiedStats.braking * deltaTime);
+                    else                                                           // Negative acceleration input and not going forwards.
+                        localVelocity.z = Mathf.MoveTowards(localVelocity.z, -m_ModifiedStats.reverseSpeed, -acceleration * m_ModifiedStats.reverseAcceleration * deltaTime);
+                }
             }
+            if (!playerDamageable.HasControl.Value)
+                localVelocity.z = 0f;
 
             if (groundInfo.isCapsuleTouching)
                 localVelocity.y = Mathf.Max(0f, localVelocity.y);
@@ -468,7 +508,7 @@ namespace KartGame.KartSystems
         /// </summary>
         void Hop(Quaternion rotationStream, GroundInfo currentGroundInfo)
         {
-            if (currentGroundInfo.isGrounded && m_Input.IsJumping.Value && m_HasControl)
+            if (currentGroundInfo.isGrounded && m_Input.IsJumping.Value && playerDamageable.HasControl.Value  && m_DriftState == DriftState.NotDrifting)
             {
                 m_Velocity += rotationStream * Vector3.up * m_ModifiedStats.hopHeight;
 
@@ -481,7 +521,15 @@ namespace KartGame.KartSystems
         /// </summary>
         void StartDrift(GroundInfo currentGroundInfo, GroundInfo nextGroundInfo, Quaternion rotationStream)
         {
-            if (m_Input.IsJumping.Value && !currentGroundInfo.isGrounded && nextGroundInfo.isGrounded && m_HasControl && m_DriftState == DriftState.NotDrifting)
+            var core = GetComponent<PlayerCore>();
+            if (core.PlayerId == PlayerId.Player1)
+            {
+                //Debug.Log(m_Input.IsJumping.Value);
+                //Debug.Log(!currentGroundInfo.isGrounded);
+                //Debug.Log(nextGroundInfo.isGrounded);
+                //Debug.Log(!currentGroundInfo.isGrounded && nextGroundInfo.isGrounded);
+            }
+            if (m_Input.IsJumping.Value && !currentGroundInfo.isGrounded && nextGroundInfo.isGrounded && playerDamageable.HasControl.Value && m_DriftState == DriftState.NotDrifting)
             {
                 Vector3 kartForward = rotationStream * Vector3.forward;
                 kartForward.y = 0f;
@@ -491,6 +539,7 @@ namespace KartGame.KartSystems
                 flatVelocity.Normalize();
 
                 float signedAngle = Vector3.SignedAngle(kartForward, flatVelocity, Vector3.up);
+                Debug.Log(signedAngle);
 
                 if (signedAngle > minDriftStartAngle && signedAngle < maxDriftStartAngle)
                 {
@@ -514,8 +563,9 @@ namespace KartGame.KartSystems
         /// </summary>
         void StopDrift(float deltaTime)
         {
-            if (!m_Input.IsJumping.Value || !m_HasControl)
+            if (!m_Input.IsJumping.Value || !playerDamageable.HasControl.Value)
             {
+                //Debug.Log("drift stop");
                 m_DriftOffset = Quaternion.RotateTowards(m_DriftOffset, Quaternion.identity, rotationCorrectionSpeed * deltaTime);
                 m_DriftState = DriftState.NotDrifting;
 
@@ -639,19 +689,19 @@ namespace KartGame.KartSystems
         /// <summary>
         /// This exists as part of the IMovable interface.  Typically it is called by the TrackManager when the race starts.
         /// </summary>
-        public void EnableControl()
-        {
-            m_HasControl = true;
-        }
+        //public void EnableControl()
+        //{
+        //    playerDamageable.HasControl.Value = true;
+        //}
 
         /// <summary>
         /// This exists as part of the IMovable interface.  Typically it is called by the TrackManager when the kart finishes its final lap.
         /// </summary>
-        public void DisableControl()
-        {
-            m_HasControl = false;
-            m_DriftState = DriftState.NotDrifting;
-        }
+        //public void DisableControl()
+        //{
+        //    playerDamageable.HasControl.Value = false;
+        //    m_DriftState = DriftState.NotDrifting;
+        //}
 
         /// <summary>
         /// This exists as part of the IMovable interface.  Typically it is called by the TrackManager to determine whether control should be re-enabled after a reposition. 
@@ -659,7 +709,7 @@ namespace KartGame.KartSystems
         /// <returns></returns>
         public bool IsControlled()
         {
-            return m_HasControl;
+            return playerDamageable.HasControl.Value;
         }
 
         ///// <summary>

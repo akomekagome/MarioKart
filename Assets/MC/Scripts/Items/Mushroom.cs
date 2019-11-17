@@ -5,6 +5,7 @@ using MC.Effects;
 using UniRx;
 using UnityEngine;
 using MC.Entitys;
+using MC.Used;
 
 namespace MC.Items
 {
@@ -25,21 +26,35 @@ namespace MC.Items
             this.affectable = affectable;
         }
 
+        private void Awake()
+        {
+            base.usage = new UseLimitUsage(1, 0f);
+            base.itemType = ItemType.Mushroom;
+        }
+
         protected override void OnStart()
         {
-            effect = new AccelerationEffect(5f, 10f);
-            base.itemType = ItemType.Mushroom;
+            effect = new AccelerationEffect(2f, 10f);
+
+
+            base.hasUsingItem
+                .SkipWhile(x => !x)
+                .Where(x => !x)
+                .FirstOrDefault()
+                .Subscribe(_ => OnUse());
 
             dropOutObservable
                 .Subscribe(_ => {
                     var entity = entityGenerator.CreateEntity(base.ItemType);
-                    ((IInstalledEntity)entity).OnInstall(base.playerTf.position);
+                    ((IInstalledEntity)entity).OnInstall(base.playerTf);
                 });
         }
 
         protected override void OnUse()
         {
             affectable.Affect(effect);
+            _finishSubject.OnNext(Unit.Default);
+            _finishSubject.OnCompleted();
         }
     }
 }

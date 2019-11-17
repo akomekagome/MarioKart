@@ -26,6 +26,8 @@ namespace MC.Players{
         public IReadOnlyReactiveProperty<float> BendAccelerate { get { return _bendAccelerate.ToReadOnlyReactiveProperty(); } }
         public IReadOnlyReactiveProperty<bool> IsDefending { get { return _isDefending.ToReadOnlyReactiveProperty(); } }
 
+        public IReadOnlyReactiveProperty<float> ItemThrowDirection => throw new NotImplementedException();
+
         private void Start()
         {
             this.UpdateAsObservable()

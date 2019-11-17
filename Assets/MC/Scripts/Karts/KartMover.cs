@@ -162,7 +162,7 @@ namespace MC.Karts{
         //    }
         //    void Hop(Quaternion stream, GroundInfo groundInfo)
         //    {
-        //        //if (currentGroundInfo.isGrounded && m_Input.HopPressed && m_HasControl)
+        //        //if (currentGroundInfo.isGrounded && m_Input.HopPressed && playerDamageable.HasControl.Value)
         //        //{
         //        //    currentVelocity += stream * Vector3.up * stats.hopHeight;
         //        //}

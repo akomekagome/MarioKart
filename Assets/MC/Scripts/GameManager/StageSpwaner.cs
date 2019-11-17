@@ -10,6 +10,8 @@ using MC.Players;
 using MC.Track;
 using System.Linq;
 using MC.Utils;
+using UnityEngine.UI;
+using MC.Presenters;
 
 namespace MC.GameManager
 {
@@ -19,11 +21,18 @@ namespace MC.GameManager
         private Subject<Unit> onStageInitComplete = new Subject<Unit>();
         [SerializeField] private StageCore stagePrefab;
         [SerializeField] private PlayerCore playerPrefab;
-        [SerializeField] private CheckPoint checkPointPrefab;
+        [SerializeField] private PlayerCore AIPrefab;
         [SerializeField] private PlayerCameraPosition cameraPrefab;
+        [SerializeField] private PlayerUI playerUIPrefab;
+        [SerializeField] private Canvas canvas;
+
         [Inject] private PlayerManager playerManager;
         [Inject] private RankManager rankManager;
+        [Inject] private DiContainer container;
+        [Inject] private RandomItemBoxGenerator randomItemBoxGenerator;
         StageCore stageCore;
+
+        private Vector2 scrrenResolution;
 
         public IObservable<Unit> OnStageInitCompleteAsObservable()
         {
@@ -33,31 +42,41 @@ namespace MC.GameManager
         
         private IEnumerator Start()
         {
+            scrrenResolution = canvas.GetComponent<RectTransform>().rect.size;
             yield return SpawnStage();
             yield return SpawnPlayer();
         }
 
         IEnumerator SpawnPlayer()
         {
-            var createCount = 2;
+            var createCount = 1;
             // yield return new WaitForSeconds(1);
-            var createPositionList = stageCore.GetPlayerStagePosition(createCount);
+            var createPositionList = stageCore.GetPlayerStagePosition;
 
             var playerCameras = SpawnCamera(createCount);
-
+            var playerUIs = SpawnPlayerUI(createCount);
             //playerPrefab.gameObject.SetActive(false);
-            for (var i = 0; i < createCount; ++i)
+            rankManager.SetPlayerCount(createPositionList.Count);
+            for (var i = 0; i < createPositionList.Count; ++i)
             {
-                var playerCore = Instantiate(playerPrefab);
-                playerCore.transform.position = createPositionList[i].position;
-                playerCameras[i].SetPosition(playerCore.transform, new Vector3(0f, 1.75f, -8f));
-                playerCore.transform.rotation = createPositionList[i].rotation;
+                var playeObj = container.InstantiatePrefab(i < createCount ? playerPrefab : AIPrefab);
+                var playerCore = playeObj.GetComponent<PlayerCore>();
+                var playerColor = playeObj.GetComponent<PlayerColor>();
+                playerColor.SetPlayerColor(GetPlayerColor(i));
+                playeObj.transform.position = createPositionList[i].position;
+                playeObj.transform.rotation = createPositionList[i].rotation;
                 playerCore.Init((PlayerId)i, playerManager, rankManager);
+                if (i < createCount)
+                {
+                    var playerCamera = playerCameras[i];
+                    playerCamera.SetPosition(playeObj.transform, new Vector3(0f, 1.75f, -8f));
+                    var playerUI = playerUIs[i];
+                    playerUI.SetPlayerId((PlayerId)i);
+                }
                 //playerCore.GetComponent<PlayerColor>().SetPlayerColor(GetPlayerColor(corePlayer.PlayerId));
                 //playerCore.GetComponent<MultiPlayerInput>().playerNumber = i + 1;
                 //playerCore.gameObject.SetActive(true);
                 playerManager.SetPlayer(playerCore);
-                rankManager.SetPlayerCount(createCount);
                 rankManager.SetPlayer(playerCore, i + 1);
             }
 
@@ -66,10 +85,78 @@ namespace MC.GameManager
             yield break;
         }
 
+        private Color GetPlayerColor(int id)
+        {
+            switch (id)
+            {
+                case 0:
+                    return Color.red;
+                case 1:
+                    return Color.blue;
+                case 2:
+                    return Color.yellow;
+                case 3:
+                    return Color.green;
+            }
+            return Color.black;
+        }
+
+        private List<PlayerUI> SpawnPlayerUI(int count)
+        {
+            var playerUIs = Enumerable.Range(0, count)
+                .Select(_ => container.InstantiatePrefab(playerUIPrefab).GetComponent<PlayerUI>())
+                .ToList();
+
+            var fieldSize = Vector3.zero;
+            var fieldcenters = new List<Vector2>();
+            switch (count)
+            {
+                case 1:
+                    fieldSize = scrrenResolution;
+                    fieldcenters = new List<Vector2>() { Vector2.zero };
+                    break;
+                case 2:
+                    fieldSize = scrrenResolution.SetX(scrrenResolution.x / 2);
+                    fieldcenters = new List<Vector2>() { new Vector2 (-scrrenResolution.x / 4, 0),
+                    new Vector2(scrrenResolution.x / 4, 0) };
+                    break;
+                case 3:
+                    fieldSize = scrrenResolution / 2f;
+                    fieldcenters = new List<Vector2>()
+                    {
+                        new Vector2(-scrrenResolution.x / 4, scrrenResolution.y / 4),
+                        scrrenResolution / 4,
+                        -scrrenResolution / 4
+                    };
+                    break;
+                case 4:
+                    fieldSize = scrrenResolution / 2f;
+                    fieldcenters = new List<Vector2>()
+                    {
+                        new Vector2(-scrrenResolution.x / 4, scrrenResolution.y / 4),
+                        scrrenResolution / 4,
+                        -scrrenResolution / 4,
+                        new Vector2(scrrenResolution.x / 4, -scrrenResolution.y / 4)
+                    };
+                    break;
+            }
+
+            for(int i = 0; i < playerUIs.Count; i++)
+            {
+                var rect = playerUIs[i].GetComponent<RectTransform>();
+                playerUIs[i].transform.SetParent(canvas.transform, false);
+                rect.localPosition = fieldcenters[i];
+                rect.sizeDelta = fieldSize;
+            }
+
+            return playerUIs;
+        }
+
+
         private List<PlayerCameraPosition> SpawnCamera(int count)
         {
             var cameras = Enumerable.Range(0, count)
-                .Select(_ => Instantiate(cameraPrefab))
+                .Select(_ => container.InstantiatePrefab(cameraPrefab).GetComponent<PlayerCameraPosition>())
                 .ToList();
 
             var cameraRectTransform = new List<Rect>();
@@ -104,9 +191,12 @@ namespace MC.GameManager
 
         IEnumerator SpawnStage()
         {
-            stageCore = Instantiate(stagePrefab);
+            stageCore = container.InstantiatePrefab(stagePrefab).GetComponent<StageCore>();
             stageCore.transform.position = Vector3.zero;
             rankManager.SetCheckPoint(stageCore.GetCheckPointPositionn);
+            rankManager.SetLapMax(3);
+            DebugExtensions.DebugShowList(stageCore.GetRandomItemBoxPosition);
+            randomItemBoxGenerator.SetPositon(stageCore.GetRandomItemBoxPosition);
             yield break;
         }
     }

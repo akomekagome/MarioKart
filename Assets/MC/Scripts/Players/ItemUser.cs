@@ -23,51 +23,46 @@ namespace MC.Players
             core = GetComponent<PlayerCore>();
             var getter = GetComponent<ItemGetter>();
             effectAffecter = GetComponent<PlayerEffectAffecter>();
-            attacker = new PlayerAttacker(core.PlayerId);
             damageable = GetComponent<PlayerDamageable>();
             input = GetComponent<IPlayerInput>();
+
             getter.UseItemObservable
                 .Subscribe(InitItem);
         }
 
-        Vector3 PerpendicularFootPoint(Vector3 a, Vector3 b, Vector3 p)
-        {
-            return a + Vector3.Project(p - a, b - a);
-        }
-
         private void InitItem(IItem item)
         {
-            var usage = item.Usage;
-            IObservable<Unit> useObservable = new Subject<Unit>();
+            //var usage = item.Usage;
+            //IObservable<Unit> useObservable = new Subject<Unit>();
 
-            if (usage is TimeLimitUsage)
-                useObservable =
-                    input.HasUsingItem
-                    .Where(x => x)
-                    .TakeUntil(Observable.Timer(TimeSpan.FromSeconds(((TimeLimitUsage)usage).TimeLimit)))
-                    .ThrottleFirst(TimeSpan.FromSeconds(((TimeLimitUsage)usage).TimeInterval))
-                    .AsUnitObservable();
-            if (usage is UseLimitUsage)
-                useObservable =
-                    input.HasUsingItem
-                    .Where(x => x)
-                    .ThrottleFirst(TimeSpan.FromSeconds(((UseLimitUsage)usage).TimeInterval))
-                    .Take(((UseLimitUsage)usage).UseLimit)
-                    .AsUnitObservable();
-            if (usage is UseLimitAnyIntervalUsage)
-                useObservable =
-                    Observable.FromCoroutine<Unit>(observer => AnyInterval(observer, input.HasUsingItem, ((UseLimitAnyIntervalUsage)usage).IntervalObservable))
-                    .Take(((UseLimitAnyIntervalUsage)usage).UseLimit)
-                    .AsUnitObservable();
+            //if (usage is TimeLimitUsage)
+            //    useObservable =
+            //        input.HasUsingItem
+            //        .Where(x => x)
+            //        .TakeUntil(Observable.Timer(TimeSpan.FromSeconds(((TimeLimitUsage)usage).TimeLimit)))
+            //        .ThrottleFirst(TimeSpan.FromSeconds(((TimeLimitUsage)usage).TimeInterval))
+            //        .AsUnitObservable();
+            //if (usage is UseLimitUsage)
+            //    useObservable =
+            //        input.HasUsingItem
+            //        .Where(x => x)
+            //        .ThrottleFirst(TimeSpan.FromSeconds(((UseLimitUsage)usage).TimeInterval))
+            //        .Take(((UseLimitUsage)usage).UseLimit)
+            //        .AsUnitObservable();
+            //if (usage is UseLimitAnyIntervalUsage)
+            //    useObservable =
+            //        Observable.FromCoroutine<Unit>(observer => AnyInterval(observer, input.HasUsingItem, ((UseLimitAnyIntervalUsage)usage).IntervalObservable))
+            //        .Take(((UseLimitAnyIntervalUsage)usage).UseLimit)
+            //        .AsUnitObservable();]
 
-            item.Init(this.transform, useObservable);
+            item.Init(this.transform, input.HasUsingItem);
 
             if (item is IAttackItem)
-                ((IAttackItem)item).InitAttackItem(attacker);
+                ((IAttackItem)item).InitAttackItem(core);
             if (item is IStrengthenItem)
                 ((IStrengthenItem)item).InitStrengthenItem(effectAffecter);
             if (item is IHaveTargetItem)
-                //((IHaveTargetItem)item).InitHaveTargetItem(core, core);
+                ((IHaveTargetItem)item).InitHaveTargetItem(core.RankReadle, core.PlayerDamageables, core.PlayerRank);
             if (item is IDropOutItem)
             {
                 var dropOutObservable =
@@ -84,6 +79,12 @@ namespace MC.Players
                     .TakeWhile(x => x)
                     .AsUnitObservable();
                 ((IDefendingItem)item).InitDefendingItem(isDefending);
+            }
+            if(item is IThrowItem)
+            {
+                var itemThrowDirection =
+                    input.ItemThrowDirection;
+                ((IThrowItem)item).InitThrowItem(itemThrowDirection);
             }
         }
 

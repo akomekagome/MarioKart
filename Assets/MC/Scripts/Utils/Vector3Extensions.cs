@@ -44,6 +44,8 @@ namespace MC.Utils{
             return origin;
         }
 
+        public static Vector2 ToXZVector2(this Vector3 origin) => new Vector2(origin.x, origin.z);
+
         public static Vector3 MeakeOnlyOneAxis(this Vector3 origin)
         {
             if (!Mathf.Approximately(origin.x, 0f)) origin.Set(origin.x, 0f, 0f);

@@ -10,6 +10,8 @@ namespace MC.Players
     public interface IPlayerRankReadle
     {
         PlayerId SearchBaseRunk(int rank);
+        PlayerCore SearchBasePlayerId(PlayerId playerId);
         IReadOnlyReactiveProperty<int> GetRankReactiveProperty(PlayerId playerId);
+        IObservable<Unit> GetGoalObservable(PlayerId playerId);
     }
 }

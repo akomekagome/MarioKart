@@ -22,5 +22,6 @@ namespace MC.Players{
         IReadOnlyReactiveProperty<float> StraightAccelerate { get; }
         IReadOnlyReactiveProperty<float> BendAccelerate { get; }
         IReadOnlyReactiveProperty<bool> IsDefending { get; }
+        IReadOnlyReactiveProperty<float> ItemThrowDirection { get; }
     }
 }

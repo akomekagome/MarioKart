@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MC.Utils;
 using MC.Items;
+using Zenject;
 
 namespace MC.GameManager
 {
@@ -25,10 +26,11 @@ namespace MC.GameManager
     public class ItemGenerator : MonoBehaviour
     {
         [SerializeField] private ItemTable itemTable;
+        [Inject] private DiContainer container;
 
         public IItem CreateItem(ItemType itemType)
         {
-            var go = Instantiate(itemTable.GetTable()[itemType]);
+            var go = container.InstantiatePrefab(itemTable.GetTable()[itemType]);
             var item = go.GetComponent<IItem>();
             return item;
         }

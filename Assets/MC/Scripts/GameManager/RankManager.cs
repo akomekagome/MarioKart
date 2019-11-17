@@ -14,15 +14,34 @@ namespace MC.GameManager
 
     public class RankManager : MonoBehaviour, IPlayerRankReadle
     {
-        private Dictionary<int, Transform> checkPointDic = new Dictionary<int, Transform>();
+        private List<Transform> checkPoints = new List<Transform>();
         private List<PlayerCore> players = new List<PlayerCore>();
         private Dictionary<PlayerId, RankInfo> playerRankInfos = new Dictionary<PlayerId, RankInfo>();
         private int playerCount;
         private int checkPointCount;
+        private int lapMax;
+        public int LapMax => lapMax;
+
+        private AsyncSubject<Unit> _initializAsyncSubject = new AsyncSubject<Unit>();
+        public IObservable<Unit> Initialized => _initializAsyncSubject;
 
         public void SetPlayerCount(int count)
         {
             playerCount = count;
+        }
+
+        public void SetLapMax(int max)
+        {
+            lapMax = max;
+        }
+
+        public IObservable<Unit> GetGoalObservable(PlayerId playerId)
+        {
+            return Observable
+                .EveryUpdate()
+                .Select(_ => playerRankInfos[playerId].laps)
+                .Where(x => x == LapMax)
+                .AsUnitObservable();
         }
 
         public IReadOnlyReactiveProperty<int> GetRankReactiveProperty(PlayerId playerId)
@@ -34,14 +53,24 @@ namespace MC.GameManager
                 .ToReactiveProperty();
         }
 
-        public void SetCheckPoint(List<Transform> checkPoints)
+        public RankInfo GetRankInfo(PlayerId playerId)
         {
-            DebugExtensions.DebugShowList(checkPoints);
-            checkPointCount = checkPoints.Count;
-            checkPointDic = checkPoints.Select((x, index) => new { x, index }).ToDictionary(x => x.index + 1, x => x.x);
+            return playerRankInfos[playerId];
         }
 
-        private PlayerCore SearchBasePlayerId(PlayerId playerId)
+        public Transform GetCheckPoint(int index)
+        {
+            return checkPoints[index % checkPointCount];
+        }
+
+        public void SetCheckPoint(List<Transform> checkPoints)
+        {
+            this.checkPoints = checkPoints;
+            checkPointCount = checkPoints.Count;
+            //checkPointDic = checkPoints.Select((x, index) => new { x, index }).ToDictionary(x => x.index + 1, x => x.x);
+        }
+
+        public PlayerCore SearchBasePlayerId(PlayerId playerId)
         {
             return players.Find(x => x.PlayerId == playerId);
         }
@@ -64,21 +93,24 @@ namespace MC.GameManager
         {
             players.Add(core);
 
-            playerRankInfos.Add(core.PlayerId, new RankInfo(0, rank, checkPointCount));
+            playerRankInfos.Add(core.PlayerId, new RankInfo(0, rank, checkPointCount - 1));
 
-            if (rank == playerCount)
-                foreach (var x in playerRankInfos)
-                    x.Value.ObserveEveryValueChanged(y => y.laps)
-                        .Subscribe(z => Debug.Log("playerId " + x.Key + "laps " + z));
+            //if (rank == playerCount)
+            //    foreach (var x in playerRankInfos)
+            //        x.Value.ObserveEveryValueChanged(y => y.laps)
+            //            .Subscribe(z => Debug.Log("playerId " + x.Key + "laps " + z));
 
-            if (rank == playerCount)
-                foreach (var x in playerRankInfos)
-                    x.Value.ObserveEveryValueChanged(y => y.checkPointId)
-                        .Subscribe(z => Debug.Log("playerId " + x.Key + "checkPointId " + z));
+            //if (rank == playerCount)
+            //    foreach (var x in playerRankInfos)
+            //        x.Value.ObserveEveryValueChanged(y => y.checkPointId)
+            //            .Subscribe(z => Debug.Log("playerId " + x.Key + "checkPointId " + z));
 
             core.ObserveEveryValueChanged(x => x.transform.position)
                 .DelayFrame(1)
                 .Subscribe(v => OnMove(core.PlayerId, v));
+
+            _initializAsyncSubject.OnNext(Unit.Default);
+            _initializAsyncSubject.OnCompleted();
         }
 
 
@@ -92,18 +124,19 @@ namespace MC.GameManager
         {
             var myRankInfo = playerRankInfos[playerId];
             var checkPointId = myRankInfo.checkPointId;
-            for (int i = (checkPointId % checkPointCount) + 1; ; i = (i % checkPointCount) + 1)
+            for (int i = 1;; i++)
             {
-                if (i == checkPointId) {
+                if (i == checkPointCount) {
                     Debug.LogError("兄（あん）ちゃんなんかおかしくね");
                     break;
                 }
-                var nextCheckPoint = checkPointDic[i];
+                var nextId = (checkPointId + i) % checkPointCount;
+                var nextCheckPoint = checkPoints[nextId];
                 float angle = Vector3.Angle(position - nextCheckPoint.transform.position, nextCheckPoint.transform.forward);
                 if (angle <= 90)
                 {
-                    playerRankInfos[playerId].checkPointId = i;
-                    if (i >= 1 && i < checkPointId)
+                    playerRankInfos[playerId].checkPointId = nextId;
+                    if (nextId >= 0 && nextId < checkPointId)
                         playerRankInfos[playerId].laps++;
                 }
                 else
@@ -111,19 +144,20 @@ namespace MC.GameManager
                     break;
                 }
             }
-            for (int i = checkPointId; ; i = i == 1 ? checkPointCount : i - 1)
+            for (int i = 0; ; i++)
             {
-                if (i == (checkPointId % checkPointCount) + 1)
+                if (i == checkPointCount)
                 {
                     Debug.LogError("兄（あん）ちゃんなんかおかしくね");
                     break;
                 }
-                var nextCheckPoint = checkPointDic[i];
+                var nextId = (checkPointId - i) % checkPointCount;
+                var nextCheckPoint = checkPoints[nextId];
                 float angle = Vector3.Angle(position - nextCheckPoint.transform.position, nextCheckPoint.transform.forward);
                 if (angle >= 90)
                 {
-                    playerRankInfos[playerId].checkPointId = i;
-                    if (i > checkPointId && i < checkPointCount)
+                    playerRankInfos[playerId].checkPointId = nextId;
+                    if (nextId > checkPointId && nextId < checkPointCount)
                         playerRankInfos[playerId].laps--;
                 }
                 else
@@ -148,7 +182,7 @@ namespace MC.GameManager
 
             count = rank;
             while (ComparePositionDown(count + 1, myRankInfo, position)) { count += 1; }
-            if (count > rank) Debug.Log("rank" + rank + " result " + ComparePositionDown(rank + 1, myRankInfo, position) + " change" + " mylap " + myRankInfo.laps + " otherlap " + playerRankInfos[SearchBaseRunk(count)].laps +  " playerId "+ playerId);
+            //if (count > rank) Debug.Log("rank" + rank + " result " + ComparePositionDown(rank + 1, myRankInfo, position) + " change" + " mylap " + myRankInfo.laps + " otherlap " + playerRankInfos[SearchBaseRunk(count)].laps +  " playerId "+ playerId);
             if (count > rank)
             {
                 foreach (var x in playerRankInfos
@@ -174,7 +208,7 @@ namespace MC.GameManager
                 return true;
 
             var otherPos = SearchBasePlayerId(otherId).transform.position;
-            var checkPointTf = checkPointDic[myRankInfo.checkPointId];
+            var checkPointTf = checkPoints[myRankInfo.checkPointId];
             if (RangeFromSurface(position, checkPointTf) <= RangeFromSurface(otherPos, checkPointTf))
                 return false;
             else
@@ -188,15 +222,6 @@ namespace MC.GameManager
             if (count > playerCount) return false;
             var otherId = SearchBaseRunk(count);
             var otherRankInfo = playerRankInfos[otherId];
-            //1 0
-            //if (myRankInfo.laps > otherRankInfo.laps)
-            //    return true;
-            //else if (myRankInfo.laps < otherRankInfo.laps)
-            //    return false;
-            //else if (myRankInfo.checkPointId > otherRankInfo.checkPointId)
-            //    return true;
-            //else if (myRankInfo.checkPointId < otherRankInfo.checkPointId)
-            //    return false;
             if (myRankInfo.laps > otherRankInfo.laps)
                 return false;
             else if (myRankInfo.laps < otherRankInfo.laps)
@@ -207,7 +232,7 @@ namespace MC.GameManager
                 return true;
 
             var otherPos = SearchBasePlayerId(otherId).transform.position;
-            var checkPointTf = checkPointDic[myRankInfo.checkPointId];
+            var checkPointTf = checkPoints[myRankInfo.checkPointId];
             if (RangeFromSurface(position, checkPointTf) >= RangeFromSurface(otherPos, checkPointTf))
                 return false;
             else
@@ -220,38 +245,5 @@ namespace MC.GameManager
             var normal = tf.forward;
             return Vector3.Dot(postion - planePositon, normal);
         }
-
-        //private void OnPass(PlayerId playerId, CheckPoint checkPoint)
-        //{
-        //    var position = SearchBasePlayerId(playerId).transform.position;
-        //    var checkPosition = checkPoint.transform.position;
-        //    float angle = Vector3.Angle(position - checkPosition, transform.forward);
-        //    if (angle <= 90)
-        //    {
-        //        playerRankInfos[playerId].checkPoint = checkPoint;
-        //    }
-        //    else
-        //    {
-        //        var maxCount = checkPoints.Count();
-        //        var passedCheckPoint = playerRankInfos[playerId].checkPoint;
-        //        var passedCheckPointId = passedCheckPoint.CheckPointId;
-        //        var checkPointId = checkPoint.CheckPointId;
-        //        if ((passedCheckPointId % maxCount) + 1 == checkPointId)
-        //            return;
-        //        else if (passedCheckPointId == checkPointId)
-        //        {
-        //            if (checkPointId == 1)
-        //            {
-        //                var lastCheckPoint = checkPoints.Last();
-        //                playerRankInfos[playerId].laps--;
-        //                playerRankInfos[playerId].checkPoint = lastCheckPoint;
-        //            }
-        //            var beforeCheckPoint = SearchBaseCheckPointId(checkPointId - 1);
-        //            playerRankInfos[playerId].checkPoint = beforeCheckPoint;
-        //        }
-        //        else
-        //            Debug.LogError("例外やで兄（あん）ちゃん: passed" + passedCheckPointId + " pass: " + checkPointId + "name: " + checkPoint.gameObject.name);
-        //    }
-        //}
     }
 }

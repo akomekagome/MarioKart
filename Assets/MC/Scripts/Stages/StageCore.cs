@@ -11,9 +11,11 @@ namespace MC.Stages
     {
         [SerializeField] private List<Transform> playerStagePosition;
         [SerializeField] private List<Transform> CheckPointPosition;
+        [SerializeField] private List<Transform> RandomItemBoxPosition;
 
-        public List<Transform> GetPlayerStagePosition (int count) => playerStagePosition.Take(count).ToList();
+        public List<Transform> GetPlayerStagePosition => playerStagePosition.ToList();
         public List<Transform> GetCheckPointPositionn => CheckPointPosition.ToList();
+        public List<Transform> GetRandomItemBoxPosition => RandomItemBoxPosition.ToList();
 
     }
 }

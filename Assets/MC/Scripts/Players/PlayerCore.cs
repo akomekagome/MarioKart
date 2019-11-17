@@ -25,7 +25,7 @@ public enum PlayerId
 
 namespace MC.Players{
 
-    public class PlayerCore : MonoBehaviour
+    public class PlayerCore : MonoBehaviour, IAttacker
     {
         private PlayerId _playerId = PlayerId.Player1;
         public PlayerId PlayerId { get { return _playerId; } }
@@ -44,9 +44,12 @@ namespace MC.Players{
             this._playerDamageables = playerDamageables;
             this._rankReadle = rankReadle;
             PlayerRank = rankReadle.GetRankReactiveProperty(playerId);
+            goalObservable = rankReadle.GetGoalObservable(playerId);
             _onInitialized.OnNext(Unit.Default);
             _onInitialized.OnCompleted();
         }
+
+        private IObservable<Unit> goalObservable { get; set; } = new Subject<Unit>();
 
         private AsyncSubject<Unit> _onInitialized = new AsyncSubject<Unit>();
         public IObservable<Unit> OnInitialized => _onInitialized;
@@ -83,6 +86,10 @@ namespace MC.Players{
         {
             PlayerRank
                 .Subscribe(x => Debug.Log("Id: " + PlayerId + " rank: " + x));
+
+            goalObservable
+                .Subscribe(_ => _hasControl.Value = false);
+
         }
 
         public void ApplyDamage(Damage damage)
