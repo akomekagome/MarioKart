@@ -49,7 +49,7 @@ namespace MC.Players{
             _onInitialized.OnCompleted();
         }
 
-        private IObservable<Unit> goalObservable { get; set; } = new Subject<Unit>();
+        public IObservable<Unit> goalObservable { get; set; } = new Subject<Unit>();
 
         private AsyncSubject<Unit> _onInitialized = new AsyncSubject<Unit>();
         public IObservable<Unit> OnInitialized => _onInitialized;
@@ -88,6 +88,7 @@ namespace MC.Players{
                 .Subscribe(x => Debug.Log("Id: " + PlayerId + " rank: " + x));
 
             goalObservable
+                .Do(_ => Debug.Log("goal"))
                 .Subscribe(_ => _hasControl.Value = false);
 
         }

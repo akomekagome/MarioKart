@@ -165,6 +165,7 @@ MonoBehaviour:
   - {fileID: 8735064774108147182}
   - {fileID: 945622224855406784}
   playerUI: {fileID: 6056908964913567084}
+  hoge: {fileID: 0}
 --- !u!1 &2622766921670633018
 GameObject:
   m_ObjectHideFlags: 0

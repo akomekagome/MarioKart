@@ -539,7 +539,6 @@ namespace KartGame.KartSystems
                 flatVelocity.Normalize();
 
                 float signedAngle = Vector3.SignedAngle(kartForward, flatVelocity, Vector3.up);
-                Debug.Log(signedAngle);
 
                 if (signedAngle > minDriftStartAngle && signedAngle < maxDriftStartAngle)
                 {

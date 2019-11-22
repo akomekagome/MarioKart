@@ -64,10 +64,6 @@ namespace MC.Players
 
             this.UpdateAsObservable()
                 .Subscribe(v => itemThrowDirection.Value = Input.GetAxis(itemVert));
-
-            this.UpdateAsObservable()
-                .Subscribe(_ => Debug.Log(StraightAccelerate.Value));
-
         }
     }
 }

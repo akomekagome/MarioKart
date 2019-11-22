@@ -20,7 +20,6 @@ public class PlayerEffectAffecter : MonoBehaviour, IEffectAffectable
             .Select(x => x.Value)
             .Subscribe(x =>
             {
-                Debug.Log(((AccelerationEffect)x)?.Time);
                 if (x is AccelerationEffect)
                     Observable
                     .Timer(TimeSpan.FromSeconds(((AccelerationEffect)x).Time))

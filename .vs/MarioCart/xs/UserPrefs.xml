@@ -1,21 +1,21 @@
 ﻿<Properties StartupConfiguration="{1F45A5F6-0FF3-A7B5-2020-EE498E2751E1}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/MC/Scripts/KartSamples/KartMovement.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/MC/Scripts/GameManager/StageSpwaner.cs">
     <Files>
-      <File FileName="Assets/MC/Scripts/GameManager/StageSpwaner.cs" Line="133" Column="32" />
+      <File FileName="Assets/MC/Scripts/GameManager/StageSpwaner.cs" Line="82" Column="36" />
       <File FileName="Assets/MC/Scripts/GameManager/GameState.cs" />
-      <File FileName="Assets/MC/Scripts/GameManager/PlayerManager.cs" />
+      <File FileName="Assets/MC/Scripts/GameManager/PlayerManager.cs" Line="31" Column="113" />
       <File FileName="Assets/Plugins/UniRx/Scripts/Async/UniTaskScheduler.cs" />
       <File FileName="Assets/MC/Scripts/Photon/PunTest.cs" />
       <File FileName="Assets/Photon/PhotonUnityNetworking/Code/CustomTypes.cs" />
       <File FileName="Assets/MC/Scripts/Players/MultiPlayerInput.cs" />
-      <File FileName="Assets/MC/Scripts/KartSamples/KartStats.cs" Line="40" Column="16" />
+      <File FileName="Assets/MC/Scripts/KartSamples/KartStats.cs" />
       <File FileName="Assets/MC/Scripts/Players/PlayerCameraPosition.cs" />
-      <File FileName="Assets/MC/Scripts/Utils/Vector3Extensions.cs" Line="47" Column="31" />
+      <File FileName="Assets/MC/Scripts/Utils/Vector3Extensions.cs" />
       <File FileName="Assets/MC/Scripts/Utils/DebugExtensions.cs" />
       <File FileName="Assets/MC/Scripts/Items/Shell.cs" />
       <File FileName="Assets/Plugins/Zenject/Source/Install/ZenjectBinding.cs" />
       <File FileName="Assets/MC/Scripts/RankTest.cs" />
-      <File FileName="Assets/MC/Scripts/Utils/Vector2Extensions.cs" Line="48" Column="1" />
+      <File FileName="Assets/MC/Scripts/Utils/Vector2Extensions.cs" />
       <File FileName="Assets/MC/Scripts/Presenters/ScorePresenter.cs" />
       <File FileName="Assets/MC/Scripts/Presenters/RankPresenter.cs" />
       <File FileName="Assets/MC/Scripts/Players/PlayerCanvas.cs" />
@@ -32,7 +32,7 @@
       <File FileName="Assets/MC/Scripts/Items/Item.cs" />
       <File FileName="Assets/MC/Scripts/Items/IItem.cs" />
       <File FileName="Assets/MC/Scripts/Stages/AccelerationPlate.cs" />
-      <File FileName="Assets/MC/Scripts/Effects/IEffectAffectable.cs" Line="1" Column="1" />
+      <File FileName="Assets/MC/Scripts/Effects/IEffectAffectable.cs" />
       <File FileName="Assets/MC/Scripts/Items/IDropOutItem.cs" />
       <File FileName="Assets/MC/Scripts/Items/IThrowItem.cs" />
       <File FileName="Assets/MC/Scripts/Players/IPlayerInput.cs" />
@@ -75,15 +75,16 @@
       <File FileName="Assets/MC/Scripts/Utils/OrderedDictionary.cs" />
       <File FileName="Assets/Plugins/UniRx/Scripts/InternalUtil/ExceptionExtensions.cs" />
       <File FileName="Assets/MC/Scripts/Utils/SerializableDictionary.cs" />
-      <File FileName="Assets/MC/Scripts/Players/AIInput.cs" Line="143" Column="44" />
-      <File FileName="Assets/MC/Scripts/KartSamples/KartMovement.cs" Line="445" Column="36" />
+      <File FileName="Assets/MC/Scripts/Players/AIInput.cs" />
+      <File FileName="Assets/MC/Scripts/KartSamples/KartMovement.cs" />
       <File FileName="Assets/MC/Scripts/GameManager/RankManager.cs" />
       <File FileName="Assets/MC/Scripts/GameManager/RankInfo.cs" />
+      <File FileName="Assets/MC/Scripts/Presenters/LapPresenter.cs" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="bb3d81a4-3e62-43e6-96bd-91b5dcf0f3fb" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="c0d2645c-65f9-4cb6-a695-208a7fee9972" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

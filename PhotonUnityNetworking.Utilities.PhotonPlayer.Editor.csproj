@@ -289,6 +289,12 @@
     <Reference Include="websocket-sharp">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
     </Reference>
+    <Reference Include="UMotionApplication">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
+    </Reference>
+    <Reference Include="UMotionEditor">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>/Users/nagahamakaito/MarioCart/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>

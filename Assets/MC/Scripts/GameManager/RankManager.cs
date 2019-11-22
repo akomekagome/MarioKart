@@ -41,6 +41,7 @@ namespace MC.GameManager
                 .EveryUpdate()
                 .Select(_ => playerRankInfos[playerId].laps)
                 .Where(x => x == LapMax)
+                .FirstOrDefault()
                 .AsUnitObservable();
         }
 

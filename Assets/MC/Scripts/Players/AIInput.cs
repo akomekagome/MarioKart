@@ -100,6 +100,10 @@ namespace MC.Players
                     }
                 });
 
+            core.HasControl
+                .Where(x => !x)
+                .Subscribe(_ => _isJumping.Value = false);
+
             Observable.EveryUpdate()
                 .Subscribe(_ =>
                 {
@@ -178,13 +182,15 @@ namespace MC.Players
                     if (!IsJumping.Value)
                     {
                         var axis = Vector3.Cross(currentVec, intersectPoint - x0);
-                        var angle = Vector3.Angle(currentVec, intersectPoint - x0) * (axis.y < 0 ? -1 : 1f);
-                        angle = Mathf.Abs(angle) <= 180 ? angle : angle / Mathf.Abs(angle) * (360f - Mathf.Abs(angle));
+                        var angle = Vector3.Angle(currentVec, intersectPoint - x0) * (axis.y < 0 ? -1f : 1f);
+                        //angle = Mathf.Abs(angle) <= 180 ? angle : -angle / Mathf.Abs(angle) * (360f - Mathf.Abs(angle));
                         var angleInOneFrame = turnSpeed * Time.deltaTime;
                         var bend = Mathf.Abs(angle) >= angleInOneFrame ? 1f : Mathf.Abs(angle) / angleInOneFrame;
-                        if (angle > 1.5f)
+                        if (playerId == PlayerId.Player1)
+                            Debug.Log(angle);
+                        if (angle > 0.01f)
                             _bendAccelerate.Value = bend;
-                        else if (angle < -1.5f)
+                        else if (angle < -0.01f)
                             _bendAccelerate.Value = -bend;
                         else
                             _bendAccelerate.Value = 0f;

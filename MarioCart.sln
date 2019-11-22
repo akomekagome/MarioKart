@@ -45,6 +45,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotonUnityNetworking.Utili
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PunDemos.DemoSlotcarEditor", "PunDemos.DemoSlotcarEditor.csproj", "{9F2B2181-8E66-9F63-AC1E-196C10D3B690}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UMotionSourceApplication", "UMotionSourceApplication.csproj", "{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UMotionSourceEditor", "UMotionSourceEditor.csproj", "{A208299A-0954-CE04-D4CC-389A00FCEBE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +143,14 @@ Global
 		{9F2B2181-8E66-9F63-AC1E-196C10D3B690}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F2B2181-8E66-9F63-AC1E-196C10D3B690}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F2B2181-8E66-9F63-AC1E-196C10D3B690}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A208299A-0954-CE04-D4CC-389A00FCEBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A208299A-0954-CE04-D4CC-389A00FCEBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A208299A-0954-CE04-D4CC-389A00FCEBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A208299A-0954-CE04-D4CC-389A00FCEBE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

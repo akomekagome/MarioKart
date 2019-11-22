@@ -12,7 +12,7 @@ namespace MC.GameManager
     public class PlayerManager : MonoBehaviour, IPlayerDamageables
     {
         private ReactiveCollection<PlayerCore> players = new ReactiveCollection<PlayerCore>();
-        private List<PlayerId> deadPlayers = new List<PlayerId>();
+        private List<PlayerId> goalPlayers = new List<PlayerId>();
 
         private IConnectableObservable<PlayerCore> onPlayerSpawned;
 
@@ -26,6 +26,9 @@ namespace MC.GameManager
                 return onPlayerSpawned;
             }
         }
+
+        private Subject<List<PlayerId>> goalPlayesSubject = new Subject<List<PlayerId>>();
+        public IObservable<List<PlayerId>> GoalPlayersObservable { get { return goalPlayesSubject.AsObservable(); } }
 
         private Subject<PlayerCore> _playerWinner = new Subject<PlayerCore>();
         public IObservable<PlayerCore> OnWinnerPlayerAsObservable()
@@ -42,19 +45,18 @@ namespace MC.GameManager
 
         public void SetPlayer(PlayerCore player)
         {
+            var playerId = player.PlayerId;
             // 多重登録禁止
-            if (players.ToList().Exists(x => x.PlayerId == player.PlayerId))
+            if (players.ToList().Exists(x => x.PlayerId == playerId))
                 return;
             // 作られたプレイヤーを管理リストに追加
             players.Add(player);
 
-            //プレイヤが死んだら
-            //player.OnPlayerDeadAsObservable
-            //    .FirstOrDefault()
-            //    .Subscribe(x =>
-            //    {
-            //        DeadPlayer(x);
-            //    });
+            player.goalObservable
+                .Subscribe(_ =>
+                {
+                    GoalPlayer(playerId);
+                });
         }
 
         /// <summary>
@@ -78,19 +80,19 @@ namespace MC.GameManager
         /// <summary>
         /// 生きているプレイヤー一覧を返す
         /// </summary>
-        public List<PlayerCore> GetAlivePlayers()
+        public List<PlayerCore> GetNonGoalPlayers()
         {
             return players
-            .Where(x => (deadPlayers.Exists(y => y == x.PlayerId) == false))
-             .ToList();
+            .Where(x => !goalPlayers.Exists(y => y == x.PlayerId))
+            .ToList();
         }
 
         /// <summary>
         /// 死んでいるプレイヤー一覧を返す
         /// </summary>
-        public List<PlayerCore> GetDeadPlayers()
+        public List<PlayerCore> GetGoalPlayers()
         {
-            return deadPlayers.Select(x => FindPlayer(x)).ToList();
+            return goalPlayers.Select(x => FindPlayer(x)).ToList();
         }
 
         /// <summary>
@@ -100,21 +102,22 @@ namespace MC.GameManager
         {
         }
 
-        private void DeadPlayer(PlayerId id)
+        private void GoalPlayer(PlayerId id)
         {
-            if (GetAlivePlayers().Count <= 1)
+            if (GetNonGoalPlayers().Count <= 1)
                 return;
 
             var player = FindPlayer(id);
 
             players.Remove(player);
-            onPlayerDeadSubject.OnNext(player);
+            goalPlayers.Add(id);
 
             if (players.Count == 1)  // 残り一人になったら
             {
-                // 勝者のPlayerCoreを通知
-                _playerWinner.OnNext(players[0]);
-                _playerWinner.OnCompleted();
+                var lastPlayer = players[0];
+                var lastPlayerId = lastPlayer.PlayerId;
+                players.Remove(lastPlayer);
+                goalPlayers.Add(lastPlayerId);
             }
         }
     }

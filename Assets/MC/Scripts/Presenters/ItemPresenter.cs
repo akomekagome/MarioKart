@@ -47,7 +47,7 @@ public class ItemPresenter : MonoBehaviour
 
         foreach (var frame  in itemSlotFrame)
         {
-            var size = frame.rect.size;
+            var size = frame.sizeDelta;
             var slotArea = new GameObject("SlotArea", typeof(RectTransform));
             slotArea.SetActive(false);
             var slotAreaRectTransform = slotArea.GetComponent<RectTransform>();
@@ -55,6 +55,7 @@ public class ItemPresenter : MonoBehaviour
             slotAreaRectTransform.anchorMin = Vector2.zero;
             slotAreaRectTransform.SetParent(frame);
             slotAreaRectTransform.localPosition = Vector3.zero;
+            slotAreaRectTransform.localScale = new Vector3(1, 1, 1);
             var slotAreaSize = size;
             slotAreaSize.y *= itemSpriteOrderdDic.Count;
             slotAreaRectTransform.sizeDelta = slotAreaSize;
@@ -70,6 +71,7 @@ public class ItemPresenter : MonoBehaviour
                 sloatpanelRectTransform.anchorMax = Vector2.zero;
                 sloatpanelRectTransform.anchorMin = Vector2.zero;
                 sloatpanelRectTransform.SetParent(slotAreaRectTransform);
+                sloatpanelRectTransform.localScale = new Vector3(1, 1, 1);
                 sloatpanelRectTransform.pivot = Vector2.zero;
                 sloatpanelRectTransform.sizeDelta = size;
                 sloatpanelRectTransform.localPosition = Vector2.zero.SetY(size.y * i);

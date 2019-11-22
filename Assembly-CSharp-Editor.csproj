@@ -64,6 +64,11 @@
   <ItemGroup>
     <Compile Include="Assets\JMO Assets\Cartoon FX Easy Editor\Editor\CFXEasyEditor.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Editor\CFX_SpawnSystemEditor.cs" />
+    <Compile Include="Assets\unity-chan!\Unity-chan! Model\Editor\CreateLocatorHere.cs" />
+    <None Include="Assets\UMotionEditor\Plugins\Windows\Editor\x64\AutodeskFbxSdkLicense.txt" />
+    <None Include="Assets\UMotionEditor\Plugins\Windows\Editor\x64\UnityFbxSdkNativeLicense.txt" />
+    <None Include="Assets\UMotionEditor\Plugins\MacOS\Editor\x64\UnityFbxSdkNativeLicense.txt" />
+    <None Include="Assets\UMotionEditor\Plugins\MacOS\Editor\x64\AutodeskFbxSdkLicense.txt" />
     <Reference Include="UnityEditor.TestRunner">
       <HintPath>/Users/nagahamakaito/MarioCart/Library/ScriptAssemblies/UnityEditor.TestRunner.dll</HintPath>
     </Reference>
@@ -318,6 +323,12 @@
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UMotionApplication">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
+    </Reference>
+    <Reference Include="UMotionEditor">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>/Users/nagahamakaito/MarioCart/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -759,6 +770,14 @@
     <ProjectReference Include="Zenject.csproj">
       <Project>{79B0BB4A-FCDE-3117-FCFB-7C354AC905FF}</Project>
       <Name>Zenject</Name>
+    </ProjectReference>
+    <ProjectReference Include="UMotionSourceApplication.csproj">
+      <Project>{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}</Project>
+      <Name>UMotionSourceApplication</Name>
+    </ProjectReference>
+    <ProjectReference Include="UMotionSourceEditor.csproj">
+      <Project>{A208299A-0954-CE04-D4CC-389A00FCEBE1}</Project>
+      <Name>UMotionSourceEditor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -50,12 +50,10 @@ namespace MC.GameManager
         IEnumerator SpawnPlayer()
         {
             var createCount = 1;
-            // yield return new WaitForSeconds(1);
             var createPositionList = stageCore.GetPlayerStagePosition;
-
-            var playerCameras = SpawnCamera(createCount);
-            var playerUIs = SpawnPlayerUI(createCount);
-            //playerPrefab.gameObject.SetActive(false);
+            
+            var playerCameras = SpawnCamera(4);
+            var playerUIs = SpawnPlayerUI(4);
             rankManager.SetPlayerCount(createPositionList.Count);
             for (var i = 0; i < createPositionList.Count; ++i)
             {
@@ -66,13 +64,13 @@ namespace MC.GameManager
                 playeObj.transform.position = createPositionList[i].position;
                 playeObj.transform.rotation = createPositionList[i].rotation;
                 playerCore.Init((PlayerId)i, playerManager, rankManager);
-                if (i < createCount)
-                {
-                    var playerCamera = playerCameras[i];
-                    playerCamera.SetPosition(playeObj.transform, new Vector3(0f, 1.75f, -8f));
-                    var playerUI = playerUIs[i];
-                    playerUI.SetPlayerId((PlayerId)i);
-                }
+                var playerCamera = playerCameras[i];
+                playerCamera.SetPosition(playeObj.transform, new Vector3(0f, 1.75f, -8f));
+                var playerUI = playerUIs[i];
+                playerUI.SetPlayerId((PlayerId)i);
+                //if (i < createCount)
+                //{
+                //}
                 //playerCore.GetComponent<PlayerColor>().SetPlayerColor(GetPlayerColor(corePlayer.PlayerId));
                 //playerCore.GetComponent<MultiPlayerInput>().playerNumber = i + 1;
                 //playerCore.gameObject.SetActive(true);
@@ -194,7 +192,7 @@ namespace MC.GameManager
             stageCore = container.InstantiatePrefab(stagePrefab).GetComponent<StageCore>();
             stageCore.transform.position = Vector3.zero;
             rankManager.SetCheckPoint(stageCore.GetCheckPointPositionn);
-            rankManager.SetLapMax(3);
+            rankManager.SetLapMax(2);
             DebugExtensions.DebugShowList(stageCore.GetRandomItemBoxPosition);
             randomItemBoxGenerator.SetPositon(stageCore.GetRandomItemBoxPosition);
             yield break;
