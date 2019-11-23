@@ -303,6 +303,12 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>/Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.Unity/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="UMotionApplication">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
+    </Reference>
+    <Reference Include="UMotionEditor">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
+    </Reference>
     <Reference Include="Zenject-usage">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Plugins/Zenject/Source/Usage/Zenject-usage.dll</HintPath>
     </Reference>
@@ -323,12 +329,6 @@
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="UMotionApplication">
-      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
-    </Reference>
-    <Reference Include="UMotionEditor">
-      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>/Users/nagahamakaito/MarioCart/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
@@ -747,6 +747,10 @@
       <Project>{325E7B75-9628-C0D4-DC56-705F249FB9E4}</Project>
       <Name>UniRx.Async</Name>
     </ProjectReference>
+    <ProjectReference Include="UMotionSourceApplication.csproj">
+      <Project>{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}</Project>
+      <Name>UMotionSourceApplication</Name>
+    </ProjectReference>
     <ProjectReference Include="UniRx.Async.Editor.csproj">
       <Project>{0B3F1947-7C18-D069-1461-858EDD503219}</Project>
       <Name>UniRx.Async.Editor</Name>
@@ -767,17 +771,13 @@
       <Project>{9AF2CA7A-6C47-C469-6192-27D23A1B92D4}</Project>
       <Name>PhotonUnityNetworking.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="Zenject.csproj">
-      <Project>{79B0BB4A-FCDE-3117-FCFB-7C354AC905FF}</Project>
-      <Name>Zenject</Name>
-    </ProjectReference>
-    <ProjectReference Include="UMotionSourceApplication.csproj">
-      <Project>{FA68B1CA-C8F1-8A6B-3AC6-1C04F559D66C}</Project>
-      <Name>UMotionSourceApplication</Name>
-    </ProjectReference>
     <ProjectReference Include="UMotionSourceEditor.csproj">
       <Project>{A208299A-0954-CE04-D4CC-389A00FCEBE1}</Project>
       <Name>UMotionSourceEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Zenject.csproj">
+      <Project>{79B0BB4A-FCDE-3117-FCFB-7C354AC905FF}</Project>
+      <Name>Zenject</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

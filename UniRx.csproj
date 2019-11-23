@@ -486,6 +486,12 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>/Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.Unity/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="UMotionApplication">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
+    </Reference>
+    <Reference Include="UMotionEditor">
+      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
+    </Reference>
     <Reference Include="Zenject-usage">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Plugins/Zenject/Source/Usage/Zenject-usage.dll</HintPath>
     </Reference>
@@ -506,12 +512,6 @@
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>/Users/nagahamakaito/MarioCart/Assets/Photon/PhotonLibs/WebSocket/websocket-sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="UMotionApplication">
-      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Application/UMotionApplication.dll</HintPath>
-    </Reference>
-    <Reference Include="UMotionEditor">
-      <HintPath>/Users/nagahamakaito/MarioCart/Assets/UMotionEditor/Plugins/Editor/UMotionEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>/Applications/Unity/Hub/Editor/2019.2.4f1/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
